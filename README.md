@@ -47,6 +47,8 @@ Game Design Document Creator 通过中文交互式问答，帮助你生成或优
 │   └── gdd_utils.py
 ├── examples/
 │   └── test-prompts.md
+├── tests/
+│   └── test_gdd_utils.py
 ├── README.md
 └── LICENSE
 ```
@@ -92,6 +94,12 @@ python scripts/gdd_utils.py append-version /path/to/user-project/Docs/GDD.md --c
 ## 测试用例
 
 见 [examples/test-prompts.md](examples/test-prompts.md)。
+
+脚本回归测试：
+
+```bash
+python -m pytest tests
+```
 
 ## 许可证
 

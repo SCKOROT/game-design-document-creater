@@ -16,13 +16,18 @@ from pathlib import Path
 
 
 REQUIRED_SECTIONS = [
+    "游戏概述",
     "核心体验陈述",
     "基本信息",
+    "游戏简介",
+    "参考游戏",
     "市场竞品分析",
     "核心玩法",
     "系统详细设计",
     "数值设计框架",
     "核心指标定义",
+    "美术需求清单",
+    "技术架构建议",
     "MVP 与垂直切片",
     "开发里程碑",
     "风险评估",
@@ -101,7 +106,7 @@ def heading_titles(markdown: str) -> list[str]:
     titles = []
     for match in HEADING_RE.finditer(markdown):
         title = match.group(1).strip()
-        title = re.sub(r"^第?[一二三四五六七八九十0-9]+[、.]\s*", "", title)
+        title = re.sub(r"^第?[\d一二三四五六七八九十]+(?:\.\d+)*(?:[、.])?\s*", "", title)
         titles.append(title)
     return titles
 
@@ -151,7 +156,7 @@ def append_version_history(path: Path, change: str, version: str | None = None) 
 
     if history_heading is None:
         addition = (
-            "\n\n---\n\n## 九、版本历史\n\n"
+            "\n\n---\n\n## 十、版本历史\n\n"
             "| 版本 | 日期 | 修改内容 |\n"
             "|------|------|----------|\n"
             f"{row}\n"

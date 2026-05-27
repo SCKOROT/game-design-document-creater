@@ -1,4 +1,4 @@
 interface:
   display_name: "GDD Creator"
   short_description: "Create or improve game design documents with guided Chinese Q&A."
-  default_prompt: "帮我设计一个游戏，并生成完整的游戏设计文档。"
+  default_prompt: "帮我设计一个游戏：先确认团队规模和核心玩法方向，再生成包含核心体验、竞品分析、核心指标、MVP 与垂直切片的完整 GDD，并保存到 Docs/GDD.md。"

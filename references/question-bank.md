@@ -15,6 +15,7 @@ Interaction rule:
    - Personal indie developer: recommend small scope, fast prototype, low asset burden, simple tech stack, minimal live-ops.
    - 2-5 person small team: recommend focused vertical slice, limited content breadth, reusable systems, modest commercial validation.
    - Professional team: allow larger production scope, specialized pipelines, deeper monetization and operations planning.
+   - Unknown yet: default to personal indie constraints first, then revise scope when the team becomes clearer.
 
 2. Game type
    - Action: hack and slash, platformer, fighting, action adventure, metroidvania.
@@ -29,18 +30,18 @@ Interaction rule:
    - Horror/puzzle: survival horror, psychological horror, escape room, pure puzzle, narrative puzzle.
    - Other: let the user describe the genre.
 
-Structured UI grouping example:
-- Round 1: Action/RPG/Strategy/Casual
-- Round 2 if needed: Simulation/Card/Shooter/Sports
-- Round 3 if needed: Music/Horror/Other/Recommendation
+Structured UI grouping example for the agent, not user-facing copy:
+- 第 1 轮：动作 / RPG / 策略 / 休闲
+- 第 2 轮：模拟经营 / 卡牌回合 / 射击 / 体育竞速
+- 第 3 轮：音乐节奏 / 恐怖解谜 / 其他 / 帮我推荐
 
 3. Art style
    - 2D pixel, 2D hand-drawn, 2D cartoon, 3D realistic, 3D low-poly, 3D cartoon, dark gothic, Chinese ink, anime, retro sci-fi, minimalist, custom.
    - Optional tone: bright, warm, dark, high contrast, monochrome/two-tone.
 
-Structured UI grouping example:
-- First ask 2D / 3D / stylized / unsure.
-- Then ask the specific style within the selected bucket.
+Structured UI grouping example for the agent, not user-facing copy:
+- 先问：2D / 3D / 风格化 / 还没确定
+- 再按所选大类追问具体风格。
 
 4. Target platform
    - WeChat mini game, mobile app, PC, web, console, multi-platform.
@@ -65,9 +66,9 @@ For multi-select core loops, prefer plain-text numbered input if the list has mo
    - Premium, free-to-play with IAP, IAP + ads, ads, subscription, hybrid, premium + DLC, recommendation.
    - If IAP is included, ask IAP types: cosmetics, characters/cards, progression resources, battle pass, gacha, remove ads, other.
 
-Structured UI grouping example:
-- First ask premium / F2P / ads / unsure.
-- Then ask details such as DLC, IAP, battle pass, gacha, or remove ads.
+Structured UI grouping example for the agent, not user-facing copy:
+- 先问：买断制 / 免费内购 / 广告变现 / 还没确定
+- 再追问 DLC、内购、战令、抽卡、去广告等细节。
 
 9. Scope and schedule
    - Personal prototype, small project, medium project, large project, large commercial project, unknown.
@@ -102,6 +103,10 @@ Personal indie developer:
 Professional team:
 - Allow Unreal/Unity, mature asset pipelines, backend services, analytics, live-ops, monetization design, and multi-platform strategy.
 - Include market positioning, KPI targets, production risks, and content roadmap.
+
+Unknown yet:
+- Start with personal indie assumptions to avoid overscoping.
+- Tell the user the plan can be recalibrated later if the team grows.
 
 ## Quick-Mode Override Parsing
 

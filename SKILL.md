@@ -18,7 +18,14 @@ Load these references only when needed:
 - `references/mvp-vertical-slice.md`: MVP, vertical slice, and core hypothesis planning.
 - `references/genre-templates.md`: genre-specific questions and required design details.
 
-Resource paths are relative to this skill's installation directory, not the user's project directory. Resolve the skill directory from the loaded `SKILL.md` location before reading references or running scripts. If the runtime does not expose the skill directory, locate this skill by finding a `SKILL.md` whose frontmatter name is `game-design-document-creator`, then use that folder as `<skill_dir>`.
+Resource paths are relative to this skill's installation directory, not the user's project directory. Resolve the skill directory from the loaded `SKILL.md` location before reading references or running scripts.
+
+Common installation path hints:
+- Claude Code: `~/.claude/skills/game-design-document-creator/` or `~/.claude/skills/game-design-document-creater/`
+- Codex: `$CODEX_HOME/skills/game-design-document-creator/` or `~/.codex/skills/game-design-document-creator/`
+- Project-local installs: `.superpowers/skills/game-design-document-creator/`
+
+If the runtime does not expose the skill directory, locate this skill by finding a `SKILL.md` whose frontmatter name is `game-design-document-creator`, then use that folder as `<skill_dir>`. If `<skill_dir>` still cannot be found, continue without scripts: read available references from the loaded skill context and use normal file tools in the user project.
 
 Use `scripts/gdd_utils.py` for deterministic file operations:
 
@@ -100,6 +107,7 @@ Do not copy protected IP, characters, story, names, levels, or art assets from t
    - 个人独立开发
    - 2-5 人小团队
    - 专业团队
+   - 还没确定：先按个人独立开发约束推荐，后续可调整
 5. Continue through the question bank, adapting depth to the user's answers.
 6. Use team size to adjust recommendations:
    - Personal indie: reduce scope, recommend low-cost art and validation milestones.
@@ -142,6 +150,10 @@ The generated GDD must include:
 10. After editing, provide a concise change summary listing changed sections, added sections, removed sections, and any remaining risks. Use `git diff` when the project is a git repository.
 
 When adding missing sections, follow `references/gdd-template.md`. When optimizing several GDDs, diagnose each file independently even if the same optimization direction is applied.
+
+## Session Resume
+
+If the user asks to continue a previously interrupted GDD session, inspect the conversation history and any draft files in the project. Summarize the collected answers, identify missing high-impact fields, and continue from the next incomplete stage instead of restarting.
 
 ## Output Standards
 
