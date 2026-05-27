@@ -30,7 +30,8 @@ def test_check_requires_headings_not_body_mentions(tmp_path):
     assert result.returncode == 0
     payload = json.loads(result.stdout)
     assert payload["score"] == 0
-    assert "核心体验陈述" in payload["missing"]
+    assert payload["required_score"] == 0
+    assert "核心体验陈述" in payload["missing_required"]
 
 
 def test_check_accepts_numbered_subheadings(tmp_path):
@@ -64,8 +65,51 @@ def test_check_accepts_numbered_subheadings(tmp_path):
     assert result.returncode == 0
     payload = json.loads(result.stdout)
     assert payload["score"] == 100
-    assert payload["missing"] == []
+    assert payload["required_score"] == 100
+    assert payload["recommended_score"] == 100
+    assert payload["missing_required"] == []
+    assert payload["missing_recommended"] == []
     assert "核心体验陈述" in payload["headings"]
+
+
+def test_check_distinguishes_recommended_sections(tmp_path):
+    gdd = tmp_path / "GDD.md"
+    gdd.write_text(
+        "\n".join(
+            [
+                "# 《测试》GDD",
+                "## 一、游戏概述",
+                "### 核心体验陈述",
+                "### 基本信息",
+                "## 二、核心玩法设计",
+                "## 三、系统详细设计",
+                "## 四、数值设计框架",
+                "### 核心指标定义",
+                "## 七、MVP 与垂直切片",
+                "## 八、开发里程碑",
+                "## 九、风险评估",
+                "## 十、版本历史",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    result = run_cli("check", str(gdd))
+    assert result.returncode == 0
+    payload = json.loads(result.stdout)
+    assert payload["required_score"] == 100
+    assert payload["recommended_score"] == 0
+    assert "游戏简介" in payload["missing_recommended"]
+
+
+def test_check_human_format(tmp_path):
+    gdd = tmp_path / "GDD.md"
+    gdd.write_text("# 《测试》GDD\n", encoding="utf-8")
+
+    result = run_cli("check", str(gdd), "--format", "human")
+    assert result.returncode == 0
+    assert "Required score:" in result.stdout
+    assert "Missing required sections:" in result.stdout
 
 
 def test_next_path_creates_docs_and_increments(tmp_path):

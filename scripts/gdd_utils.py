@@ -19,19 +19,22 @@ REQUIRED_SECTIONS = [
     "游戏概述",
     "核心体验陈述",
     "基本信息",
-    "游戏简介",
-    "参考游戏",
-    "市场竞品分析",
     "核心玩法",
     "系统详细设计",
     "数值设计框架",
     "核心指标定义",
-    "美术需求清单",
-    "技术架构建议",
     "MVP 与垂直切片",
     "开发里程碑",
     "风险评估",
     "版本历史",
+]
+
+RECOMMENDED_SECTIONS = [
+    "游戏简介",
+    "参考游戏",
+    "市场竞品分析",
+    "美术需求清单",
+    "技术架构建议",
 ]
 
 EXCLUDED_DIRS = {".git", "references", "examples", "scripts", "agents"}
@@ -118,21 +121,63 @@ def check_structure(path: Path) -> dict[str, object]:
         raise IsADirectoryError(f"Expected a Markdown file, got directory: {path}")
     text = path.read_text(encoding="utf-8")
     headings = heading_titles(text)
-    present = [
+    present_required = [
         section
         for section in REQUIRED_SECTIONS
         if any(section == heading or section in heading for heading in headings)
     ]
-    missing = [section for section in REQUIRED_SECTIONS if section not in present]
-    score = round(len(present) / len(REQUIRED_SECTIONS) * 100)
+    missing_required = [section for section in REQUIRED_SECTIONS if section not in present_required]
+    present_recommended = [
+        section
+        for section in RECOMMENDED_SECTIONS
+        if any(section == heading or section in heading for heading in headings)
+    ]
+    missing_recommended = [section for section in RECOMMENDED_SECTIONS if section not in present_recommended]
+    required_score = round(len(present_required) / len(REQUIRED_SECTIONS) * 100)
+    recommended_score = round(len(present_recommended) / len(RECOMMENDED_SECTIONS) * 100)
     return {
         "path": str(path),
         "title": extract_title(text),
-        "score": score,
-        "present": present,
-        "missing": missing,
+        "score": required_score,
+        "required_score": required_score,
+        "recommended_score": recommended_score,
+        "present": present_required,
+        "missing": missing_required,
+        "present_required": present_required,
+        "missing_required": missing_required,
+        "present_recommended": present_recommended,
+        "missing_recommended": missing_recommended,
+        "checked_sections": {
+            "required": REQUIRED_SECTIONS,
+            "recommended": RECOMMENDED_SECTIONS,
+        },
         "headings": headings,
     }
+
+
+def format_check_human(result: dict[str, object]) -> str:
+    lines = [
+        f"GDD: {result['title']}",
+        f"Path: {result['path']}",
+        f"Required score: {result['required_score']}/100",
+        f"Recommended score: {result['recommended_score']}/100",
+        "",
+        "Missing required sections:",
+    ]
+    missing_required = result["missing_required"]
+    if missing_required:
+        lines.extend(f"- {section}" for section in missing_required)
+    else:
+        lines.append("- None")
+
+    lines.append("")
+    lines.append("Missing recommended sections:")
+    missing_recommended = result["missing_recommended"]
+    if missing_recommended:
+        lines.extend(f"- {section}" for section in missing_recommended)
+    else:
+        lines.append("- None")
+    return "\n".join(lines)
 
 
 def append_version_history(path: Path, change: str, version: str | None = None) -> None:
@@ -200,8 +245,14 @@ def main() -> int:
     list_parser = subparsers.add_parser("list", help="List detected GDD files as JSON")
     list_parser.add_argument("--root", default=".", help="Project root")
 
-    check_parser = subparsers.add_parser("check", help="Check required GDD sections")
+    check_parser = subparsers.add_parser("check", help="Check GDD structure")
     check_parser.add_argument("path", help="GDD Markdown file")
+    check_parser.add_argument(
+        "--format",
+        choices=["json", "human"],
+        default="json",
+        help="Output format",
+    )
 
     version_parser = subparsers.add_parser("append-version", help="Append a version-history row")
     version_parser.add_argument("path", help="GDD Markdown file")
@@ -217,7 +268,11 @@ def main() -> int:
         print(json.dumps(list_gdds(Path(args.root).resolve()), ensure_ascii=False, indent=2))
         return 0
     if args.command == "check":
-        print(json.dumps(check_structure(Path(args.path).resolve()), ensure_ascii=False, indent=2))
+        result = check_structure(Path(args.path).resolve())
+        if args.format == "human":
+            print(format_check_human(result))
+        else:
+            print(json.dumps(result, ensure_ascii=False, indent=2))
         return 0
     if args.command == "append-version":
         append_version_history(Path(args.path).resolve(), args.change, args.version)

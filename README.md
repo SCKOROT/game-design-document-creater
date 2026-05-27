@@ -88,8 +88,11 @@ cp -R . ~/.claude/skills/game-design-document-creator/
 python scripts/gdd_utils.py next-path --root /path/to/user-project
 python scripts/gdd_utils.py list --root /path/to/user-project
 python scripts/gdd_utils.py check /path/to/user-project/Docs/GDD.md
+python scripts/gdd_utils.py check /path/to/user-project/Docs/GDD.md --format human
 python scripts/gdd_utils.py append-version /path/to/user-project/Docs/GDD.md --change "优化核心循环"
 ```
+
+`check` 默认输出 JSON，便于 AI/脚本消费；`--format human` 输出终端可读摘要。结构检查分为必要章节和推荐章节，缺少推荐章节不会代表 GDD 不可用。
 
 ## 测试用例
 
@@ -100,6 +103,8 @@ python scripts/gdd_utils.py append-version /path/to/user-project/Docs/GDD.md --c
 ```bash
 python -m pytest tests
 ```
+
+GitHub Actions 会在 push 和 pull request 时自动运行这组测试。
 
 ## 许可证
 

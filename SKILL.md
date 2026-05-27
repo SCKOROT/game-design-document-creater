@@ -32,6 +32,7 @@ Use `scripts/gdd_utils.py` for deterministic file operations:
 - `python <skill_dir>/scripts/gdd_utils.py next-path --root <project_dir>`
 - `python <skill_dir>/scripts/gdd_utils.py list --root <project_dir>`
 - `python <skill_dir>/scripts/gdd_utils.py check <project_dir>/Docs/GDD.md`
+- `python <skill_dir>/scripts/gdd_utils.py check <project_dir>/Docs/GDD.md --format human`
 - `python <skill_dir>/scripts/gdd_utils.py append-version <project_dir>/Docs/GDD.md --change "优化核心循环"`
 
 ## Commands And Triggers
@@ -175,6 +176,7 @@ Before finalizing, check:
 
 - The generated or edited file exists at the intended path.
 - Run `<skill_dir>/scripts/gdd_utils.py check <path>` when scripts are available.
+- Treat missing required sections as blockers. Treat missing recommended sections as improvement suggestions unless the user asked for a full production GDD.
 - The GDD contains the upgraded sections: 开发团队/团队规模, 核心体验陈述, 市场竞品分析, 核心指标定义, and MVP 与垂直切片.
 - Quick-mode overrides from "但是..." style instructions were applied.
 - Existing user content was preserved unless it conflicted with the requested optimization.
