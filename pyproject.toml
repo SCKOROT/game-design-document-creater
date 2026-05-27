@@ -1,0 +1,13 @@
+[project]
+name = "gdd-creator"
+version = "0.1.0"
+description = "Utilities and tests for the Game Design Document Creator skill."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+
+[project.optional-dependencies]
+test = ["pytest>=7"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

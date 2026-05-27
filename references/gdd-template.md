@@ -179,8 +179,11 @@ For personal indie projects, replace heavy monetization metrics with prototype c
 
 ## 十、版本历史
 
+版本历史按新到旧排序，最新修改记录放在最上方。
+
 | 版本 | 日期 | 修改内容 |
 |------|------|----------|
+| vNext | [日期] | [最新修改内容] |
 | v1.0 | [日期] | 初始版本 |
 ```
 

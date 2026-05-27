@@ -121,6 +121,10 @@ def heading_titles(markdown: str) -> list[str]:
     return titles
 
 
+def has_section(headings: list[str], section: str) -> bool:
+    return any(section == heading or heading.startswith(section) for heading in headings)
+
+
 def check_structure(path: Path) -> dict[str, object]:
     if not path.exists():
         raise FileNotFoundError(f"GDD file not found: {path}")
@@ -131,13 +135,13 @@ def check_structure(path: Path) -> dict[str, object]:
     present_required = [
         section
         for section in REQUIRED_SECTIONS
-        if any(section == heading or section in heading for heading in headings)
+        if has_section(headings, section)
     ]
     missing_required = [section for section in REQUIRED_SECTIONS if section not in present_required]
     present_recommended = [
         section
         for section in RECOMMENDED_SECTIONS
-        if any(section == heading or section in heading for heading in headings)
+        if has_section(headings, section)
     ]
     missing_recommended = [section for section in RECOMMENDED_SECTIONS if section not in present_recommended]
     required_score = round(len(present_required) / len(REQUIRED_SECTIONS) * 100)

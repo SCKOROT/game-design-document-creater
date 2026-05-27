@@ -7,3 +7,8 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/

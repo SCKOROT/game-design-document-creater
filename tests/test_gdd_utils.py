@@ -106,6 +106,34 @@ def test_check_distinguishes_recommended_sections(tmp_path):
     assert "游戏简介" in payload["missing_recommended"]
 
 
+def test_check_does_not_match_section_in_middle_of_heading(tmp_path):
+    gdd = tmp_path / "GDD.md"
+    gdd.write_text(
+        "\n".join(
+            [
+                "# 《测试》GDD",
+                "## 一、游戏概述",
+                "### 核心体验陈述",
+                "### 基本信息",
+                "## 二、非核心玩法讨论",
+                "## 三、系统详细设计",
+                "## 四、数值设计框架",
+                "### 核心指标定义",
+                "## 七、MVP 与垂直切片",
+                "## 八、开发里程碑",
+                "## 九、风险评估",
+                "## 十、版本历史",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    result = run_cli("check", str(gdd))
+    assert result.returncode == 0
+    payload = json.loads(result.stdout)
+    assert "核心玩法" in payload["missing_required"]
+
+
 def test_check_human_format(tmp_path):
     gdd = tmp_path / "GDD.md"
     gdd.write_text("# 《测试》GDD\n", encoding="utf-8")
