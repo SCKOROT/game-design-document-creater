@@ -1,113 +1,236 @@
+<div align="center">
+
 # Game Design Document Creator
 
-> Claude Code / Codex Skill - 中文游戏策划案生成与优化助手
+### AI-Powered Game Design Document Generator
+
+**Chinese-first interactive skill for Claude Code / Codex**
 
 [![Test](https://github.com/SCKOROT/game-design-document-creater/actions/workflows/test.yml/badge.svg)](https://github.com/SCKOROT/game-design-document-creater/actions/workflows/test.yml)
 [![Python 3.9+](https://img.shields.io/badge/Python-3.9%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
-[![Skill](https://img.shields.io/badge/Claude%20%2F%20Codex-Skill-6B46C1)](SKILL.md)
+[![Skill](https://img.shields.io/badge/Claude%20Code-Skill-6B46C1?logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0id2hpdGUiPjxwYXRoIGQ9Ik0xMiAyQzYuNDggMiAyIDYuNDggMiAxMnM0LjQ4IDEwIDEwIDEwIDEwLTQuNDggMTAtMTBTMTcuNTIgMiAxMiAyem0tMiAxNWwtNS01IDEuNDEtMS40MUwxMCAxNC4xN2w3LjU5LTcuNTlMMTkgOGwtOSA5eiIvPjwvc3ZnPg==)](SKILL.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-Game Design Document Creator 通过中文交互式问答，帮助你快速生成、检查和优化完整的游戏设计文档 (GDD)。它适合个人独立开发、2-5 人小团队，也能为专业团队提供更结构化的市场、指标、MVP 和风险分析。
+<br>
 
-## 亮点
+*Through Chinese interactive Q&A, quickly generate, check, and optimize*
+*complete Game Design Documents (GDD)*
 
-| 能力 | 说明 |
-|------|------|
-| 新建 GDD | 从团队规模、类型、平台、引擎、核心循环、目标用户和商业模式开始生成完整文档。 |
-| 快速模式 | 支持“参考某游戏，但是加入自定义变化”的复合指令，并保留差异化要求。 |
-| 优化模式 | 先读取已有 GDD，输出健康度分析，再按系统、数值、商业、MVP 等方向优化。 |
-| 团队规模适配 | 个人、小团队、专业团队会得到不同的范围、引擎、商业模式和指标建议。 |
-| 市场与指标 | 输出核心体验陈述、竞品分析、核心指标定义、MVP/垂直切片和生产风险。 |
-| 运行时安全 | 超过 4 个选项的问题会拆分或改用编号输入，避免结构化问答工具超限。 |
+<br>
 
-## 触发方式
+[Quick Start](#-quick-start) · [Features](#-features) · [Usage](#-usage) · [Architecture](#-architecture) · [CLI Tools](#-cli-tools) · [Testing](#-testing)
 
-| 方式 | 示例 |
-|------|------|
-| 命令 | `/gddcreator` |
-| 新建 | “帮我设计一个游戏” |
-| 新建 | “生成游戏策划案” |
-| 快速模式 | “按照原神给我设计一个游戏” |
-| 复合快速模式 | “参考《杀戮尖塔》，但改为国风武侠题材，并加入装备成长系统” |
-| 优化模式 | “帮我优化策划案” |
+</div>
 
-旧命令 `/gamecreater` 和 `/game-design-document-creater` 仍可理解，但建议统一使用 `/gddcreator`。
+<br>
 
-## GDD 输出内容
+## Overview
 
-- 核心体验陈述：“在这个游戏里，玩家感受到……”
-- 基本信息：团队规模、类型、平台、屏幕方向、引擎、用户、商业模式、规模。
-- 参考游戏与市场竞品分析。
-- 核心玩法、核心循环、系统详细设计。
-- 数值设计框架和核心指标定义。
-- MVP、垂直切片和核心假设。
-- 美术需求、技术架构、开发里程碑。
-- 技术、市场、生产风险评估。
-- 版本历史。
+Game Design Document Creator is a Claude Code / Codex skill that generates professional-grade Game Design Documents through structured Chinese dialogue. It adapts recommendations based on your team size — from solo indie developers to professional studios — covering gameplay design, numerical frameworks, market analysis, MVP planning, and risk assessment.
 
-生成前会先展示摘要并让用户确认，避免回答有误时直接写入文件。
+<br>
 
-## 目录结构
+## Features
 
-```text
-.
-├── SKILL.md
+<table>
+<tr>
+<td width="50%">
+
+### Create New GDD
+Start from scratch with guided Q&A covering team size, genre, platform, engine, core loop, target audience, and business model. Outputs a complete 10-chapter document.
+
+</td>
+<td width="50%">
+
+### Quick Mode
+Use a reference game as starting point:
+```
+"Build something like Slay the Spire,
+ but with a wuxia theme and
+ equipment progression"
+```
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+### Optimize Existing GDD
+Reads your existing document, outputs a health analysis with quality scores, then optimizes by category: systems, numerical design, monetization, or MVP scope.
+
+</td>
+<td width="50%">
+
+### Team-Size Adaptive
+Solo indie, small team (2-5), or professional studio — each gets tailored scope, engine recommendations, business model suggestions, and success metrics.
+
+</td>
+</tr>
+</table>
+
+<br>
+
+## GDD Structure
+
+Every generated document follows a standardized 10-chapter structure:
+
+```
+ Chapter 1   Game Overview — core experience statement, basic info, market analysis
+ Chapter 2   Core Gameplay — core loop, depth, major systems, controls
+ Chapter 3   Detailed System Design — per-system specs with dependencies
+ Chapter 4   Numerical Framework — economy, growth curves, KPI definitions
+ Chapter 5   Art Requirements — characters, scenes, UI, VFX/audio
+ Chapter 6   Technical Architecture — engine choice, key technical challenges
+ Chapter 7   MVP & Vertical Slice — minimum scope, core hypotheses
+ Chapter 8   Development Milestones — phased delivery with validation criteria
+ Chapter 9   Risk Assessment — technical, market, and production risks
+ Chapter 10  Version History — changelog with newest entries first
+```
+
+<br>
+
+## Quick Start
+
+**1. Install the skill**
+
+```bash
+# Clone into Claude Code skills directory
+git clone https://github.com/SCKOROT/game-design-document-creater.git \
+  ~/.claude/skills/game-design-document-creator
+```
+
+**2. Use it in Claude Code**
+
+```
+> /gddcreator
+```
+
+Or just describe what you want:
+
+```
+> design me a roguelike card game for solo development,
+  dark fairy tale art style, targeting Steam premium
+```
+
+<br>
+
+## Usage
+
+| Trigger | Example |
+|---------|---------|
+| Command | `/gddcreator` |
+| New GDD | *"help me design a game"* |
+| Quick Mode | *"design a game based on Genshin Impact"* |
+| Quick + Overrides | *"reference Slay the Spire, but change to wuxia theme with equipment progression"* |
+| Optimize | *"help me optimize my design document"* |
+
+> Legacy commands `/gamecreater` and `/game-design-document-creater` are still recognized.
+
+<br>
+
+## Architecture
+
+```
+game-design-document-creater/
+│
+├── SKILL.md                          # Skill entry point — routing & orchestration
+│
 ├── references/
-│   ├── question-bank.md
-│   ├── gdd-template.md
-│   ├── optimization-rules.md
-│   ├── quality-rubric.md
-│   ├── mvp-vertical-slice.md
-│   └── genre-templates.md
+│   ├── question-bank.md              # Structured Q&A definitions
+│   ├── gdd-template.md               # 10-chapter output template
+│   ├── genre-templates.md            # 9 genre archetypes (RPG, Card, Casual, ...)
+│   ├── quality-rubric.md             # 100-point scoring rubric
+│   ├── optimization-rules.md         # Health analysis & optimization directions
+│   └── mvp-vertical-slice.md         # MVP scoping rules by team size
+│
 ├── scripts/
-│   └── gdd_utils.py
-├── examples/
-│   └── test-prompts.md
+│   └── gdd_utils.py                  # Deterministic CLI utilities
+│
 ├── tests/
-│   └── test_gdd_utils.py
-├── pyproject.toml
-├── README.md
-└── LICENSE
+│   └── test_gdd_utils.py             # Cross-platform test suite
+│
+├── examples/
+│   └── test-prompts.md               # Smoke-test prompts for all modes
+│
+└── agents/
+    └── openai.yaml                   # OpenAI/Codex agent config
 ```
 
-`SKILL.md` 只保留触发、路由和执行规则；详细问答、模板和优化诊断规则放在 `references/` 中，减少主 skill 的上下文负担。
+`SKILL.md` stays lean (~180 lines) — all detailed question definitions, templates, and diagnostic rules live in `references/`, keeping the main skill's context footprint small.
 
-## 安装
+<br>
 
-将整个目录复制到 Claude Code / Codex 的 skills 目录中：
+## CLI Tools
+
+The `gdd_utils.py` script handles deterministic operations that don't need AI:
 
 ```bash
-mkdir -p ~/.claude/skills/game-design-document-creator
-cp -R . ~/.claude/skills/game-design-document-creator/
+# Find next available GDD filename
+python scripts/gdd_utils.py next-path --root /path/to/project
+
+# List all detected GDD files
+python scripts/gdd_utils.py list --root /path/to/project
+
+# Check GDD structure completeness (JSON output)
+python scripts/gdd_utils.py check Docs/GDD.md
+
+# Human-readable structure report
+python scripts/gdd_utils.py check Docs/GDD.md --format human
+
+# Append version history entry
+python scripts/gdd_utils.py append-version Docs/GDD.md --change "Optimized core loop" --version v1.1
 ```
 
-如果你的环境使用 Codex skills 目录，请复制到对应的 `$CODEX_HOME/skills` 或 `~/.codex/skills`。
+Structure checks distinguish **required sections** (11) from **recommended sections** (5) — a GDD missing recommended sections is still usable, just less thorough.
 
-## 工具脚本
+<br>
 
-这些命令需要从 skill 安装目录或仓库目录运行；在实际用户项目中使用时，把脚本路径替换为 skill 安装目录下的绝对路径。
-
-```bash
-python scripts/gdd_utils.py next-path --root /path/to/user-project
-python scripts/gdd_utils.py list --root /path/to/user-project
-python scripts/gdd_utils.py check /path/to/user-project/Docs/GDD.md
-python scripts/gdd_utils.py check /path/to/user-project/Docs/GDD.md --format human
-python scripts/gdd_utils.py append-version /path/to/user-project/Docs/GDD.md --change "优化核心循环"
-```
-
-`check` 默认输出 JSON，便于 AI/脚本消费；`--format human` 输出终端可读摘要。结构检查分为必要章节和推荐章节，缺少推荐章节不会代表 GDD 不可用。
-
-## 测试
+## Testing
 
 ```bash
+# Install dev dependencies
 python -m pip install -e ".[test]"
+
+# Run tests
 python -m pytest
 ```
 
-GitHub Actions 会在 push 和 pull request 时于 Linux 与 Windows 上自动运行测试，避免编码和路径类问题漏过。
+CI runs on every push and PR across **Ubuntu** and **Windows** to catch encoding and path issues early.
 
-更多交互样例见 [examples/test-prompts.md](examples/test-prompts.md)。
+<br>
 
-## 许可证
+## Supported Genres
 
-[MIT License](LICENSE)
+The skill includes specialized guidance for 9 genre archetypes:
+
+| | | |
+|:---:|:---:|:---:|
+| RPG / ARPG | Card / Roguelike | Casual / Puzzle |
+| Shooter / FPS | Music / Rhythm | Sports / Racing |
+| Horror / Puzzle | Simulation / Management | Strategy / SLG |
+
+Each genre template provides tailored recommendations for core loops, system design priorities, art direction, and scope calibration.
+
+<br>
+
+## Quality Scoring
+
+Generated GDDs are evaluated on a **100-point rubric** across 9 dimensions:
+
+| Dimension | What it measures |
+|-----------|-----------------|
+| Core Experience | Clarity and alignment of the core experience statement |
+| Gameplay Design | Core loop completeness, depth, and system coherence |
+| Numerical Framework | Economy balance, growth curves, KPI definitions |
+| Content & Art | Asset scope vs. team capacity |
+| Technical | Engine fit, key technical risks addressed |
+| Market & Monetization | Competitor analysis, business model coherence |
+| MVP & Validation | Scope discipline, testable hypotheses |
+| Production | Milestone realism, risk coverage |
+| Document Quality | Structure, consistency, actionability |
+
+<br>
+
+## License
+
+[MIT](LICENSE) &copy; 2024 AKOROT
