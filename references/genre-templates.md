@@ -62,6 +62,51 @@ Must define:
 - Encounter design loop.
 - Weapon/enemy matrix.
 
+## Music And Rhythm
+
+Ask or infer:
+- Input model: tap, hold, slide, gesture, instrument-like, motion.
+- Chart style: falling notes, lanes, radial, freeform, rhythm combat.
+- Music source: licensed tracks, original tracks, procedural, user-generated.
+- Difficulty model: speed, density, timing windows, modifiers.
+- Session structure: single song, campaign, daily challenge, PvP score race.
+
+Must define:
+- Timing window and scoring model.
+- Track/content production plan.
+- Difficulty ladder.
+- Audio latency calibration needs.
+
+## Sports And Racing
+
+Ask or infer:
+- Sport/race type and realism level.
+- Control model: arcade, simulation, manager, hybrid.
+- Session length and match/race format.
+- Progression: athletes, vehicles, teams, leagues, upgrades.
+- Competition model: AI, local PvP, online PvP, asynchronous leaderboard.
+
+Must define:
+- Moment-to-moment skill expression.
+- Match/race pacing.
+- Progression and upgrade economy.
+- Fairness and rubber-band/comeback rules.
+
+## Horror And Puzzle
+
+Ask or infer:
+- Horror emphasis: survival, psychological, chase, atmosphere, body horror, suspense.
+- Puzzle model: inventory, logic, spatial, physics, narrative clue, escape room.
+- Failure model: death, restart, resource loss, narrative consequence.
+- Tension curve and safe-room pacing.
+- Content format: rooms, chapters, cases, open location.
+
+Must define:
+- Fear/tension target.
+- Puzzle clue chain and hint system.
+- Resource pressure or fail-state rules.
+- Pacing between tension, relief, and discovery.
+
 ## Simulation And Management
 
 Ask or infer:

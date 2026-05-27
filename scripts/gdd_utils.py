@@ -23,12 +23,14 @@ REQUIRED_SECTIONS = [
     "系统详细设计",
     "数值设计框架",
     "核心指标定义",
+    "MVP 与垂直切片",
     "开发里程碑",
     "风险评估",
     "版本历史",
 ]
 
 EXCLUDED_DIRS = {".git", "references", "examples", "scripts", "agents"}
+HEADING_RE = re.compile(r"^\s{0,3}#{1,6}\s+(.+?)\s*$", re.MULTILINE)
 
 
 def docs_dir(root: Path) -> Path:
@@ -95,10 +97,28 @@ def list_gdds(root: Path) -> list[dict[str, str]]:
     return entries
 
 
+def heading_titles(markdown: str) -> list[str]:
+    titles = []
+    for match in HEADING_RE.finditer(markdown):
+        title = match.group(1).strip()
+        title = re.sub(r"^第?[一二三四五六七八九十0-9]+[、.]\s*", "", title)
+        titles.append(title)
+    return titles
+
+
 def check_structure(path: Path) -> dict[str, object]:
+    if not path.exists():
+        raise FileNotFoundError(f"GDD file not found: {path}")
+    if not path.is_file():
+        raise IsADirectoryError(f"Expected a Markdown file, got directory: {path}")
     text = path.read_text(encoding="utf-8")
-    present = [section for section in REQUIRED_SECTIONS if section in text]
-    missing = [section for section in REQUIRED_SECTIONS if section not in text]
+    headings = heading_titles(text)
+    present = [
+        section
+        for section in REQUIRED_SECTIONS
+        if any(section == heading or section in heading for heading in headings)
+    ]
+    missing = [section for section in REQUIRED_SECTIONS if section not in present]
     score = round(len(present) / len(REQUIRED_SECTIONS) * 100)
     return {
         "path": str(path),
@@ -106,15 +126,30 @@ def check_structure(path: Path) -> dict[str, object]:
         "score": score,
         "present": present,
         "missing": missing,
+        "headings": headings,
     }
 
 
 def append_version_history(path: Path, change: str, version: str | None = None) -> None:
+    if not path.exists():
+        raise FileNotFoundError(f"GDD file not found: {path}")
+    if not path.is_file():
+        raise IsADirectoryError(f"Expected a Markdown file, got directory: {path}")
     text = path.read_text(encoding="utf-8")
     today = date.today().isoformat()
     row = f"| {version or 'vNext'} | {today} | {change} |"
 
-    if "版本历史" not in text:
+    lines = text.splitlines()
+    history_heading = next(
+        (
+            index
+            for index, line in enumerate(lines)
+            if re.match(r"^\s{0,3}#{1,6}\s+.*版本历史\s*$", line)
+        ),
+        None,
+    )
+
+    if history_heading is None:
         addition = (
             "\n\n---\n\n## 九、版本历史\n\n"
             "| 版本 | 日期 | 修改内容 |\n"
@@ -124,18 +159,29 @@ def append_version_history(path: Path, change: str, version: str | None = None) 
         path.write_text(text.rstrip() + addition, encoding="utf-8")
         return
 
-    lines = text.splitlines()
-    insert_at = len(lines)
-    for index, line in enumerate(lines):
-        if "版本历史" in line:
-            insert_at = index + 1
-            while insert_at < len(lines) and (
-                lines[insert_at].strip() == ""
-                or set(lines[insert_at].strip()) <= {"|", "-", " ", "版", "本", "日", "期", "修", "改", "内", "容"}
-            ):
-                insert_at += 1
-            break
-    lines.insert(insert_at, row)
+    table_header = next(
+        (
+            index
+            for index in range(history_heading + 1, len(lines))
+            if re.match(r"^\|\s*版本\s*\|\s*日期\s*\|\s*修改内容\s*\|", lines[index])
+        ),
+        None,
+    )
+    if table_header is None:
+        insert_at = history_heading + 1
+        lines[insert_at:insert_at] = [
+            "",
+            "| 版本 | 日期 | 修改内容 |",
+            "|------|------|----------|",
+            row,
+        ]
+    else:
+        separator = table_header + 1
+        if separator < len(lines) and re.match(r"^\|\s*-+", lines[separator]):
+            insert_at = separator + 1
+        else:
+            insert_at = table_header + 1
+        lines.insert(insert_at, row)
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
@@ -175,4 +221,8 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    try:
+        raise SystemExit(main())
+    except (FileNotFoundError, IsADirectoryError, UnicodeDecodeError) as error:
+        print(json.dumps({"error": str(error)}, ensure_ascii=False), flush=True)
+        raise SystemExit(2)

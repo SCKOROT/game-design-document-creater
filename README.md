@@ -80,11 +80,13 @@ cp -R . ~/.claude/skills/game-design-document-creator/
 
 ## 工具脚本
 
+这些命令需要从 skill 安装目录或仓库目录运行；在实际用户项目中使用时，把脚本路径替换为 skill 安装目录下的绝对路径。
+
 ```bash
-python scripts/gdd_utils.py next-path --root .
-python scripts/gdd_utils.py list --root .
-python scripts/gdd_utils.py check Docs/GDD.md
-python scripts/gdd_utils.py append-version Docs/GDD.md --change "优化核心循环"
+python scripts/gdd_utils.py next-path --root /path/to/user-project
+python scripts/gdd_utils.py list --root /path/to/user-project
+python scripts/gdd_utils.py check /path/to/user-project/Docs/GDD.md
+python scripts/gdd_utils.py append-version /path/to/user-project/Docs/GDD.md --change "优化核心循环"
 ```
 
 ## 测试用例

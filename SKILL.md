@@ -18,12 +18,14 @@ Load these references only when needed:
 - `references/mvp-vertical-slice.md`: MVP, vertical slice, and core hypothesis planning.
 - `references/genre-templates.md`: genre-specific questions and required design details.
 
+Resource paths are relative to this skill's installation directory, not the user's project directory. Resolve the skill directory from the loaded `SKILL.md` location before reading references or running scripts. If the runtime does not expose the skill directory, locate this skill by finding a `SKILL.md` whose frontmatter name is `game-design-document-creator`, then use that folder as `<skill_dir>`.
+
 Use `scripts/gdd_utils.py` for deterministic file operations:
 
-- `python scripts/gdd_utils.py next-path --root .`
-- `python scripts/gdd_utils.py list --root .`
-- `python scripts/gdd_utils.py check Docs/GDD.md`
-- `python scripts/gdd_utils.py append-version Docs/GDD.md --change "优化核心循环"`
+- `python <skill_dir>/scripts/gdd_utils.py next-path --root <project_dir>`
+- `python <skill_dir>/scripts/gdd_utils.py list --root <project_dir>`
+- `python <skill_dir>/scripts/gdd_utils.py check <project_dir>/Docs/GDD.md`
+- `python <skill_dir>/scripts/gdd_utils.py append-version <project_dir>/Docs/GDD.md --change "优化核心循环"`
 
 ## Commands And Triggers
 
@@ -42,7 +44,7 @@ If the user uses old names such as `/gamecreater` or `/game-design-document-crea
 ## Startup
 
 1. Inspect the user request.
-2. Search for existing GDD files with `scripts/gdd_utils.py list --root .` when scripts are available; otherwise use patterns such as `Docs/**/*.md`, `docs/**/*.md`, `**/*GDD*.md`, and `**/*策划*.md`.
+2. Search for existing GDD files with `<skill_dir>/scripts/gdd_utils.py list --root <project_dir>` when scripts are available; otherwise use patterns such as `Docs/**/*.md`, `docs/**/*.md`, `**/*GDD*.md`, and `**/*策划*.md`.
 3. Choose the mode:
    - Quick mode: request contains "按照", "参考", or "类似" plus a reference game.
    - Optimization mode: request asks to optimize, modify, improve, complete, diagnose, or upgrade an existing GDD.
@@ -68,6 +70,7 @@ Use when the user asks to design by referencing another game.
 1. Load `references/question-bank.md`.
 2. Parse the reference game and any override clause after words such as "但是", "但", "不过", "并且", or "同时".
 3. Build a baseline analysis of the reference game's type, art style, core loop, platform, audience, business model, and key features.
+   - If web search is available and the game is recent, obscure, or uncertain, search reliable sources to verify its genre, platform, core loop, and monetization before analyzing.
    - If the reference game is obscure or cannot be confidently identified, say so and ask the user for 2-3 short descriptors such as genre, platform, core loop, art style, or monetization.
    - If partial information is available, label uncertain fields as assumptions instead of inventing specifics.
 4. Apply explicit user overrides before showing the result.
@@ -104,7 +107,7 @@ Do not copy protected IP, characters, story, names, levels, or art assets from t
    - Professional team: include analytics, live-ops, production pipeline, and market positioning where appropriate.
 7. Before writing the document, summarize the captured direction and ask the user to confirm or revise.
 8. Load `references/gdd-template.md` and create the Markdown GDD after confirmation.
-9. Save new GDD files under `Docs/`. Prefer `scripts/gdd_utils.py next-path --root .` to create the directory and pick the path.
+9. Save new GDD files under `Docs/`. Prefer `<skill_dir>/scripts/gdd_utils.py next-path --root <project_dir>` to create the directory and pick the path.
 
 The generated GDD must include:
 
@@ -135,7 +138,8 @@ The generated GDD must include:
    - Risk quality
 7. Ask the user which dimensions to optimize.
 8. Edit the chosen GDD in place unless the user asks for a copy.
-9. Add or update the version-history section with a concise description of the change. Prefer `scripts/gdd_utils.py append-version` when scripts are available.
+9. Add or update the version-history section with a concise description of the change. Prefer `<skill_dir>/scripts/gdd_utils.py append-version` when scripts are available.
+10. After editing, provide a concise change summary listing changed sections, added sections, removed sections, and any remaining risks. Use `git diff` when the project is a git repository.
 
 When adding missing sections, follow `references/gdd-template.md`. When optimizing several GDDs, diagnose each file independently even if the same optimization direction is applied.
 
@@ -158,7 +162,7 @@ When adding missing sections, follow `references/gdd-template.md`. When optimizi
 Before finalizing, check:
 
 - The generated or edited file exists at the intended path.
-- Run `scripts/gdd_utils.py check <path>` when scripts are available.
+- Run `<skill_dir>/scripts/gdd_utils.py check <path>` when scripts are available.
 - The GDD contains the upgraded sections: 开发团队/团队规模, 核心体验陈述, 市场竞品分析, 核心指标定义, and MVP 与垂直切片.
 - Quick-mode overrides from "但是..." style instructions were applied.
 - Existing user content was preserved unless it conflicted with the requested optimization.

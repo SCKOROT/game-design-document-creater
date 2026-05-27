@@ -31,6 +31,12 @@ Keep the health analysis diagnostic, not judgmental. Use it to guide the next qu
 
 Offer focused choices after the health analysis:
 
+If using a structured question UI with a 2-4 option limit, group these choices:
+
+- Round 1: Core experience, core loop/systems, team-size/scope, full restructuring.
+- Round 2: Market differentiation, numerical framework/metrics, monetization, technical architecture.
+- Round 3: Art production cost, milestones, MVP/vertical slice, other.
+
 1. Core experience statement
 2. Core loop and main systems
 3. Team-size/scope realignment
