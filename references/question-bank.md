@@ -108,7 +108,7 @@ Professional team:
 When the user says "按照/参考/类似 [reference game] 但是 [changes]", parse the part after "但是/但/不过/并且/同时" as overrides before asking follow-up questions.
 
 Examples:
-- "按照杀戮尖塔，但是做成国风武侠，弱化卡牌构筑，强化装备养成"
+- "按照《杀戮尖塔》，但改为国风武侠题材，弱化卡牌构筑，强化装备养成"
   - Reference game: 杀戮尖塔
   - Overrides: art/theme = 国风武侠, system emphasis = less deckbuilding, more equipment growth
 - "参考原神但做成买断制单机，不要抽卡"

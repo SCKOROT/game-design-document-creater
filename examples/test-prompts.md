@@ -18,7 +18,7 @@ Expected behavior:
 ## Quick Mode With Overrides
 
 ```text
-参考原神，但是做成买断制单机，不要抽卡，团队只有 2-5 人，战斗可以简化。
+参考《原神》，但改为买断制单机，不要抽卡，团队只有 2-5 人，战斗可以简化。
 ```
 
 Expected behavior:
