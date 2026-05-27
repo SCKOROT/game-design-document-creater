@@ -1,0 +1,4 @@
+interface:
+  display_name: "GDD Creator"
+  short_description: "Create or improve game design documents with guided Chinese Q&A."
+  default_prompt: "帮我设计一个游戏，并生成完整的游戏设计文档。"

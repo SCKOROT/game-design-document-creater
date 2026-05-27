@@ -1,0 +1,181 @@
+# GDD Output Template
+
+Use this reference when writing the final Markdown GDD.
+
+## File Naming
+
+Save new documents under `Docs/`.
+
+- First document: `Docs/GDD.md`
+- If it exists: `Docs/GDD2.md`, `Docs/GDD3.md`, etc.
+- For a named game, a readable filename is allowed if the project already uses that convention.
+
+## Required Structure
+
+```markdown
+# 《游戏名称》游戏设计文档 (GDD)
+
+> 生成日期：[日期]
+
+---
+
+## 一、游戏概述
+
+### 1.1 核心体验陈述
+在这个游戏里，玩家感受到：[一句话描述核心情绪、张力、幻想或成就感]。
+
+### 1.2 基本信息
+| 项目 | 内容 |
+|------|------|
+| 游戏名称 | [名称] |
+| 开发团队 | [个人独立开发 / 2-5人小团队 / 专业团队] |
+| 游戏类型 | [类型 + 细分类型] |
+| 美术风格 | [风格 + 色调] |
+| 目标平台 | [平台] |
+| 屏幕方向 | [仅移动端填写] |
+| 游戏引擎 | [引擎 + 推荐理由] |
+| 目标用户 | [用户群体 + 年龄层] |
+| 商业模式 | [模式 + 适配理由] |
+| 游戏规模 | [规模] |
+| 开发周期 | [周期] |
+| 核心特色 | [特色描述] |
+
+### 1.3 游戏简介
+[用一段话说明玩法、题材、玩家目标和差异化。]
+
+### 1.4 参考游戏
+[列出参考游戏，并说明只借鉴设计模式，不复制 IP、角色、剧情、美术资产。]
+
+### 1.5 市场竞品分析
+| 竞品 | 可借鉴点 | 我们的差异化 | 需要避免的问题 |
+|------|----------|--------------|----------------|
+| [竞品A] | [设计模式] | [差异化] | [风险] |
+| [竞品B] | [设计模式] | [差异化] | [风险] |
+
+---
+
+## 二、核心玩法设计
+
+### 2.1 核心循环
+[用步骤或简图描述玩家反复进行的行动链。]
+
+### 2.2 玩法深度
+[说明上手门槛、策略深度、成长空间和长期目标。]
+
+### 2.3 主要系统
+[根据类型列出核心系统，并说明它们如何服务核心体验陈述。]
+
+### 2.4 操作方式
+[根据平台和屏幕方向设计操作方式。]
+
+---
+
+## 三、系统详细设计
+
+### 3.1 [系统1名称]
+[目标、规则、输入输出、成长或消耗、与其他系统的关系。]
+
+### 3.2 [系统2名称]
+[目标、规则、输入输出、成长或消耗、与其他系统的关系。]
+
+---
+
+## 四、数值设计框架
+
+### 4.1 核心数值体系
+[核心资源、属性、伤害/收益公式方向、经济循环。]
+
+### 4.2 成长曲线
+[前期、中期、后期成长节奏。]
+
+### 4.3 核心指标定义
+| 指标 | 目标值/观察方式 | 设计含义 |
+|------|------------------|----------|
+| D1 留存 | [按团队规模填写或标注为测试观察] | [首日吸引力] |
+| D7 留存 | [可选] | [中期循环质量] |
+| 平均会话时长 | [目标] | [单局/单次体验长度] |
+| 内容消耗速度 | [目标] | [内容产能压力] |
+| 付费率/ARPU | [商业项目填写；独立项目可替换为愿望单/转化] | [商业模型验证] |
+
+For personal indie projects, replace heavy monetization metrics with prototype completion rate, playtest completion rate, average session length, wishlist/conversion, demo feedback quality, or refund risk.
+
+---
+
+## 五、美术需求清单
+
+### 5.1 角色美术
+[需求列表]
+
+### 5.2 场景美术
+[需求列表]
+
+### 5.3 UI 设计
+[需求列表]
+
+### 5.4 特效音效
+[需求列表]
+
+---
+
+## 六、技术架构建议
+
+### 6.1 推荐引擎
+[结合团队规模、平台、玩法和美术成本说明推荐。]
+
+### 6.2 核心技术点
+[技术要点列表]
+
+---
+
+## 七、开发里程碑
+
+Before this section, load `mvp-vertical-slice.md` and include the MVP and vertical slice section. If numbering is important, use:
+
+- 七、MVP 与垂直切片
+- 八、开发里程碑
+- 九、风险评估
+- 十、版本历史
+
+### Phase 1: 核心玩法验证
+[目标、交付物、验证指标]
+
+### Phase 2: 系统完善
+[目标、交付物、验证指标]
+
+### Phase 3: 内容填充
+[目标、交付物、验证指标]
+
+### Phase 4: 打磨上线
+[目标、交付物、验证指标]
+
+---
+
+## 八、风险评估
+
+### 8.1 技术风险
+[风险点和应对策略]
+
+### 8.2 市场风险
+[风险点和应对策略]
+
+### 8.3 生产风险
+[团队规模、内容产能、美术成本、上线周期相关风险]
+
+---
+
+## 九、版本历史
+
+| 版本 | 日期 | 修改内容 |
+|------|------|----------|
+| v1.0 | [日期] | 初始版本 |
+```
+
+## Quality Bar
+
+Before finalizing, check:
+- The core experience statement matches the mechanics and audience.
+- Team size, scope, engine, art style, monetization, and schedule do not contradict each other.
+- The market competitor table states real differentiation, not just "better graphics" or "more fun".
+- Core metrics are appropriate to the team size and business model.
+- MVP scope and vertical slice are small enough for the team and strong enough to test the core experience.
+- Each major system supports the core loop.

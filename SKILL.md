@@ -1,1320 +1,164 @@
 ---
-name: gddcreater
-description: Use when user wants to create a game design document (GDD) through interactive Q&A. Triggers on /gddcreator command or requests like "帮我设计一个游戏", "生成游戏策划案", "我想做一个游戏".
+name: game-design-document-creator
+description: Create or improve game design documents (GDD) through interactive Chinese Q&A. Use when the user asks to design a game, generate a game planning document, create a GDD, optimize an existing game plan, or design by referencing another game such as "按照原神设计一个游戏", "帮我设计一个游戏", "生成游戏策划案", "优化策划案", or "/gddcreator".
 ---
 
-# Game Design Document Creater - 游戏策划案生成器
-
-## Overview
-
-通过交互式问答帮助用户生成完整的游戏策划文档(GDD)。支持新建策划案和优化已有策划案两种模式。系统性地收集游戏类型、风格、核心循环、目标用户等信息，最终输出结构化的策划方案。
-
-## When to Use
-
-- 用户输入 `/gamecreater` 命令
-- 用户说"帮我设计一个游戏"
-- 用户说"生成游戏策划案"
-- 用户说"我想做一个XX类型的游戏"
-- 用户需要游戏设计文档
-- 用户想优化已有的策划案
-
-## Startup Flow
-
-### 流程判断逻辑
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                        用户输入                                  │
-└─────────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────────┐
-│  判断1: 是否是"按照/参考XX游戏"格式？                            │
-│  例如："按照原神给我设计一个游戏"、"参考马里奥设计游戏"          │
-└─────────────────────────────────────────────────────────────────┘
-                    │ Yes                    │ No
-                    ▼                        ▼
-            【快速模式】            ┌─────────────────────┐
-                                    │ 检查项目内策划案     │
-                                    └─────────────────────┘
-                                              │
-                              ┌───────────────┴───────────────┐
-                              ▼                               ▼
-                    【有策划案】                      【无策划案】
-                              │                               │
-                              ▼                               ▼
-              ┌───────────────────────────┐         【新建模式】
-              │ 判断2: 用户输入类型        │
-              ├───────────────────────────┤
-              │ A. /game-design-document- │
-              │    creater (命令)         │──→ 【询问选择】
-              │                           │    新建 or 优化
-              │ B. "帮我设计游戏"         │
-              │    (设计类语言)           │──→ 【新建模式】
-              │                           │
-              │ C. "帮我优化策划案"       │
-              │    (优化类语言)           │──→ 【优化模式】
-              └───────────────────────────┘
-```
-
-### 判断规则详解
-
-#### 规则1: 快速模式触发
-**条件**: 用户输入包含"按照"/"参考" + 游戏名称
-**示例**:
-- "按照原神给我设计一个游戏"
-- "参考马里奥设计游戏"
-- "我想做一个类似塞尔达的游戏"
-
-**行为**: 直接进入快速模式，分析参考游戏
-
-#### 规则2: 无策划案时
-**条件**: 项目内没有策划案文件
-**行为**: 直接进入新建模式
-
-#### 规则3: 有策划案 + 命令触发
-**条件**: 用户输入 `/game-design-document-creater` 命令
-**行为**: 询问用户选择新建还是优化
-
-#### 规则4: 有策划案 + 设计类语言
-**条件**: 用户说"帮我设计游戏"、"我想设计一个游戏"等
-**行为**: 直接进入新建模式
-
-#### 规则5: 有策划案 + 优化类语言
-**条件**: 用户说"帮我优化策划案"、"修改一下策划案"等
-**行为**: 直接进入优化模式
-
----
-
-### Step 0: 检查已有策划案
-
-**使用 Glob 工具检查项目内的策划案文件：**
-```
-Glob pattern: "Docs/**/*.md" 或 "docs/**/*.md" 或 "**/*GDD*.md" 或 "**/*策划*.md"
-```
-
----
-
-## Quick Mode: 参考游戏快速生成
-
-**触发条件：用户直接说"按照XX游戏给我设计一个游戏"或"参考XX游戏设计"**
-
-### 自动分析参考游戏
-
-**立即分析参考游戏并展示：**
-```
-📊 已分析《参考游戏名》的核心信息：
-
-| 项目 | 分析结果 |
-|------|----------|
-| **游戏类型** | [类型+细化类型] |
-| **美术风格** | [风格描述] |
-| **核心循环** | [核心玩法循环] |
-| **目标平台** | [平台] |
-| **屏幕方向** | [横屏/竖屏/双向支持]（手机游戏时显示） |
-| **游戏引擎** | [引擎] |
-| **目标用户** | [用户群体] |
-| **商业模式** | [模式] |
-| **核心特色** | [特色描述] |
-
----
-
-请问您是否需要修改这些元素？
-
-1. ✅ 直接生成策划案（无需修改）
-2. ✏️ 修改部分元素
-```
-
-### 用户选择"直接生成"
-- 直接使用分析结果生成策划案
-- 跳过所有问答环节
-
-### 用户选择"修改部分元素"
-```
-问题: 请选择需要修改的方面（可多选）：
-
-选项:
-1. 🎮 游戏类型
-2. 🎨 美术风格
-3. 📱 目标平台
-4. 📐 屏幕方向（手机游戏）
-5. 🔄 核心玩法循环
-6. 👥 目标用户
-7. 💰 商业模式
-8. ✨ 核心特色
-9. ➕ 添加更多特色
-
-请输入编号（多选用逗号分隔，如 1,3,5）：
-```
-
-**仅针对用户选择的方面进行提问，其他保持分析结果**
-
----
-
-## Mode A: 新建策划案流程
-
-### Question Flow
-
-按顺序询问以下问题，每个问题提供选项供用户选择：
-
-### 1. 游戏类型（基础问题）
-```
-问题: 你想制作什么类型的游戏？
-
-选项:
-1. 动作游戏 (ACT) - 强调操作和反应，如格斗、砍杀、平台跳跃
-2. 角色扮演 (RPG) - 角色成长和剧情，如ARPG、JRPG、MMORPG
-3. 策略游戏 (SLG/RTS) - 战略规划和资源管理，如战棋、塔防、RTS
-4. 休闲游戏 - 简单易上手，碎片时间，如消除、跑酷、放置
-5. 模拟经营 - 经营管理，资源调配，如农场、餐厅、城市建设
-6. 卡牌/回合制 - 策略卡牌，回合战斗，如TCG、DBG、回合制RPG
-7. 射击游戏 - 射击战斗，如FPS、TPS、弹幕射击
-8. 体育/竞速 - 体育运动或赛车竞速
-9. 音乐/节奏 - 音乐节拍类游戏
-10. 恐怖/解谜 - 恐怖生存或益智解谜
-11. 其他类型 - 用户自定义描述
-```
-
-### 1.1 射击游戏细化问题
-**触发条件：用户选择了"射击游戏"**
-
-```
-问题: 射击游戏的视角是？
-
-选项:
-1. 第一人称射击 (FPS) - 玩家视角，沉浸感强，如《CS》《使命召唤》
-2. 第三人称射击 (TPS) - 可见角色，动作感强，如《绝地求生》《战争机器》
-3. 俯视角射击 - 上帝视角，如《孤胆枪手》《元气骑士》
-4. 横版射击 - 2D横向卷轴，如《魂斗罗》《合金弹头》
-5. 弹幕射击 (STG) - 大量弹幕躲避，如《东方Project》
-6. 射击+其他玩法混合 - 如射击+RPG、射击+塔防、射击+卡牌
-7. 还没想好，帮我推荐
-```
-
-### 1.2 RPG细化问题
-**触发条件：用户选择了"角色扮演(RPG)"**
-
-```
-问题: RPG的具体类型是？
-
-选项:
-1. ARPG (动作RPG) - 即时战斗，操作感强，如《暗黑破坏神》《原神》
-2. JRPG (日式RPG) - 回合制/半回合制，重剧情，如《最终幻想》《女神异闻录》
-3. MMORPG - 大型多人在线，如《魔兽世界》《最终幻想14》
-4. 挂机RPG/放置RPG - 自动战斗，成长为主，如《剑与远征》
-5. Roguelike RPG - 随机地牢，永久死亡，如《哈迪斯》《死亡细胞》
-6. 回合制RPG - 经典回合战斗，策略性强
-7. 沙盒RPG - 开放世界，自由探索，如《上古卷轴》
-8. 还没想好，帮我推荐
-```
-
-### 1.3 策略游戏细化问题
-**触发条件：用户选择了"策略游戏"**
-
-```
-问题: 策略游戏的具体类型是？
-
-选项:
-1. 回合制策略 (SLG) - 经典战棋玩法，如《文明》《三国志》
-2. 即时战略 (RTS) - 实时操控，资源竞争，如《星际争霸》《帝国时代》
-3. 塔防策略 - 防守塔防，如《王国保卫战》《植物大战僵尸》
-4. 模拟经营+策略 - 经营为主，策略为辅，如《模拟城市》
-5. 战棋策略 - 回合制战棋，如《火焰纹章》《XCOM》
-6. 自走棋 - 自动对战，如《云顶之弈》《刀塔自走棋》
-7. 还没想好，帮我推荐
-```
-
-### 1.4 动作游戏细化问题
-**触发条件：用户选择了"动作游戏"**
-
-```
-问题: 动作游戏的具体类型是？
-
-选项:
-1. 砍杀类 (Hack & Slash) - 连招战斗，如《鬼泣》《真三国无双》
-2. 平台跳跃 - 跳跃闯关，如《超级马里奥》《空洞骑士》
-3. 格斗游戏 - 1v1对战，如《街头霸王》《拳皇》
-4. 动作冒险 - 开放世界探索+战斗，如《塞尔达传说》《战神》
-5. 银河恶魔城 - 2D横版探索+战斗，如《恶魔城》《空洞骑士》
-6. 音乐节奏+动作 - 结合动作的音乐游戏，如《节奏地牢》
-7. 还没想好，帮我推荐
-```
-
-### 1.5 休闲游戏细化问题
-**触发条件：用户选择了"休闲游戏"**
-
-```
-问题: 休闲游戏的具体类型是？
-
-选项:
-1. 消除类 - 三消、连连看，如《开心消消乐》《Candy Crush》
-2. 麻将/棋牌类 - 麻将、扑克、象棋，如《欢乐麻将》
-3. 跑酷类 - 跳跃跑酷，如《神庙逃亡》《地铁跑酷》
-4. 益智解谜 - 逻辑推理，如《纪念碑谷》《传送门》
-5. 放置挂机 - 自动收益，如《点击英雄》
-6. 休闲竞技 - 轻量PVP，如《蛋仔派对》
-7. 文字/剧情向 - 文字冒险，如《流言侦探》
-8. 还没想好，帮我推荐
-```
-
-### 1.5.1 麻将/棋牌细化问题
-**触发条件：用户在休闲游戏细化中选择了"麻将/棋牌类"**
-
-```
-问题: 麻将/棋牌游戏的具体玩法是？
-
-选项:
-1. 经典麻将 - 四川麻将、广东麻将、国标麻将
-2. 血战麻将 - 四川血战到底玩法
-3. 扑克牌类 - 斗地主、德州扑克、炸金花
-4. 棋类游戏 - 中国象棋、国际象棋、围棋
-5. 麻将消消乐 - 麻将主题消除
-6. 麻将竞技对战 - 实时PVP
-7. 麻将+RPG - 麻将结合角色养成
-8. 其他玩法
-```
-
-### 1.6 模拟经营细化问题
-**触发条件：用户选择了"模拟经营"**
-
-```
-问题: 模拟经营游戏的具体类型是？
-
-选项:
-1. 城市建设 - 城市规划，如《模拟城市》《城市：天际线》
-2. 农场经营 - 种植养殖，如《星露谷物语》《农场模拟》
-3. 餐厅/店铺经营 - 经营店铺，如《开罗游戏》系列
-4. 体育经营 - 球队管理，如《足球经理》
-5. 人生模拟 - 生活模拟，如《模拟人生》
-6. 企业经营 - 公司管理，如《游戏发展国》
-7. 还没想好，帮我推荐
-```
-
-### 1.7 卡牌/回合制细化问题
-**触发条件：用户选择了"卡牌/回合制"**
-
-```
-问题: 卡牌/回合制游戏的具体类型是？
-
-选项:
-1. TCG/CCG - 收集对战，如《炉石传说》《万智牌》
-2. DBG (牌组构建) - 牌组构建地牢，如《杀戮尖塔》
-3. 回合制RPG - 经典回合战斗，如《女神异闻录》
-4. 卡牌+策略 - 策略卡牌对战
-5. 卡牌+养成 - 卡牌角色养成，如《阴阳师》
-6. 战术回合制 - 网格战术，如《火焰纹章》
-7. 还没想好，帮我推荐
-```
-
-### 1.8 体育/竞速细化问题
-**触发条件：用户选择了"体育/竞速"**
-
-```
-问题: 体育/竞速游戏的具体类型是？
-
-选项:
-1. 足球游戏 - 如《FIFA》《实况足球》
-2. 篮球游戏 - 如《NBA 2K》
-3. 赛车竞速 - 如《极品飞车》《马里奥赛车》
-4. 其他体育 - 网球、高尔夫、拳击等
-5. 极限运动 - 滑板、滑雪、冲浪
-6. 体育经理 - 经营管理类
-7. 还没想好，帮我推荐
-```
-
-### 1.9 音乐/节奏细化问题
-**触发条件：用户选择了"音乐/节奏"**
-
-```
-问题: 音乐/节奏游戏的具体类型是？
-
-选项:
-1. 下落式音游 - 音符下落点击，如《Deemo》《Cytus》
-2. 节奏动作 - 节奏+战斗，如《节奏地牢》《Muse Dash》
-3. 音乐舞蹈 - 舞蹈节奏，如《劲舞团》
-4. 音乐创作 - 音乐制作，如《节奏医生》
-5. 音乐游戏+剧情 - 音乐叙事，如《钢琴师》
-6. 还没想好，帮我推荐
-```
-
-### 1.10 恐怖/解谜细化问题
-**触发条件：用户选择了"恐怖/解谜"**
-
-```
-问题: 恐怖/解谜游戏的具体类型是？
-
-选项:
-1. 生存恐怖 - 恐怖生存，如《生化危机》《寂静岭》
-2. 心理恐怖 - 恐怖氛围，如《层层恐惧》
-3. 逃脱解谜 - 密室逃脱，如《逃生》
-4. 纯解谜 - 逻辑解谜，如《传送门》《见证者》
-5. 叙事解谜 - 剧情+解谜，如《地狱边境》
-6. 恐怖+动作 - 恐怖战斗，如《恶灵附身》
-7. 还没想好，帮我推荐
-```
-
-### 2. 游戏风格
-```
-问题: 游戏的美术风格是怎样的？
-
-选项:
-1. 2D像素风 - 复古像素艺术，如《星露谷物语》《空洞骑士》
-2. 2D手绘风 - 美术手绘风格，如《茶杯头》《饥荒》
-3. 2D卡通风 - Q版卡通风格，如《植物大战僵尸》
-4. 3D写实风 - 真实感3D画面，如《使命召唤》《原神》
-5. 3D低多边形 (Low Poly) - 低多边形风格，如《纪念碑谷》
-6. 3D卡通风 - 3D卡通渲染，如《马里奥奥德赛》
-7. 暗黑哥特风 - 暗黑风格，如《黑暗之魂》《恶魔城》
-8. 国风/水墨风 - 中国传统风格，如《太吾绘卷》《江南百景图》
-9. 二次元/动漫风 - 日系动漫风格，如《原神》《崩坏3》
-10. 赛克风格 - 复古科幻风格，如《死亡细胞》
-11. 极简主义 - 简约几何风格，如《纪念碑谷》
-12. 其他风格 - 用户自定义描述
-```
-
-### 2.1 美术风格细化（可选）
-**触发条件：用户选择了特定风格后，询问是否需要进一步定义**
-
-```
-问题: 美术风格的色调偏向是？（可选）
-
-选项:
-1. 明亮鲜艳 - 活泼明快的色彩
-2. 柔和温暖 - 温馨舒适的色调
-3. 暗沉压抑 - 压抑阴暗的氛围
-4. 高对比度 - 强烈对比的视觉
-5. 单色/双色 - 极简配色方案
-6. 跳过此问题
-```
-
-### 3. 目标平台
-```
-问题: 游戏的目标平台是什么？
-
-选项:
-1. 微信小游戏 - 轻量级H5游戏
-2. 手机APP (iOS/Android) - 移动端原生
-3. PC端 - Windows/Mac客户端
-4. 网页游戏 - 浏览器运行
-5. 主机平台 - PS/Xbox/Switch
-6. 多平台 - 跨平台发布
-```
-
-### 3.1 手机游戏屏幕方向
-**触发条件：用户选择了"手机APP"或"微信小游戏"或"多平台"（多平台需确认是否包含手机）**
-
-```
-问题: 游戏的屏幕方向是？
-
-选项:
-1. 竖屏 (Portrait) - 单手操作友好，适合休闲游戏
-2. 横屏 (Landscape) - 沉浸感强，适合动作/射击/RPG游戏
-3. 双向支持 - 支持横竖屏切换，适配性更广
-4. 还没想好，帮我推荐
-```
-
-**如果用户选择"还没想好，帮我推荐"：**
-```
-根据您的游戏类型，推荐如下：
-
-- 动作/射击/RPG游戏 → 推荐【横屏】，操作空间大，沉浸感强
-- 休闲/卡牌/消除游戏 → 推荐【竖屏】，单手操作，碎片时间友好
-- 棋牌/策略游戏 → 推荐【双向支持】，不同场景灵活切换
-
-请问您选择哪种方向？
-```
-
-### 4. 游戏引擎
-```
-问题: 您打算使用什么游戏引擎来制作这个游戏？
-
-选项:
-1. Unity - 跨平台能力强，社区资源丰富
-2. Unreal Engine - 高端3D画面，蓝图可视化编程
-3. Godot - 开源免费，轻量级
-4. Cocos Creator - 适合2D游戏，小游戏开发
-5. GameMaker - 2D游戏专用，易上手
-6. 自研引擎 - 自行开发引擎
-7. 其他引擎 - 用户自定义描述
-8. 还没想好，帮我推荐
-```
-
-### 4.1 引擎版本
-**触发条件：用户选择了具体的游戏引擎（非"还没想好"或"其他引擎"）**
-
-```
-问题: 您计划使用的引擎版本是？
-
-选项:
-1. 最新 LTS 版本（推荐） - 长期支持版本，稳定可靠
-2. 最新正式版（非 LTS） - 体验最新特性
-3. 指定版本 - 输入具体版本号
-4. 还没确定，使用推荐版本
-```
-
-**如果用户选择"指定版本"：**
-```
-问题: 请输入您想使用的引擎版本号：
-（例如：Unity 2022.3.45f1、UE 5.3、Godot 4.2、Cocos Creator 3.8）
-```
-
-### 5. 核心玩法循环
-```
-问题: 游戏的核心玩法循环是什么？
-（玩家在游戏中反复做的事情，可多选）
-
-选项:
-1. 战斗刷宝 - 打怪→掉落→变强→打更强的怪，如《暗黑破坏神》
-2. 关卡挑战 - 挑战关卡→获得奖励→解锁下一关，如《超级马里奥》
-3. 经营建设 - 收集资源→建设→扩张→更多资源，如《模拟城市》
-4. 竞技对抗 - 匹配→对战→获得排名→继续匹配，如《王者荣耀》
-5. 探索收集 - 探索世界→发现收集→解锁内容，如《塞尔达传说》
-6. 社交互动 - 与玩家互动→建立关系→共同游戏，如《动物森友会》
-7. 剧情体验 - 推进剧情→解锁故事→体验结局，如《最终幻想》
-8. 策略博弈 - 思考决策→执行策略→获得结果，如《文明》
-9. 养成成长 - 培养角色/装备→提升能力→挑战更高难度
-10. 创造分享 - 创造内容→分享展示→获得反馈，如《我的世界》
-11. 其他玩法 - 用户自定义描述
-```
-
-**支持多选：提示用户可以用逗号分隔选择多个，如"1,5,9"**
-
-### 5.1 核心玩法深度（可选）
-**触发条件：用户选择了核心玩法循环后**
-
-```
-问题: 核心玩法的深度偏向是？
-
-选项:
-1. 易上手难精通 - 入门简单，但有深度可挖掘
-2. 简单休闲 - 轻松愉快，不需要太多思考
-3. 硬核深度 - 需要投入时间学习和练习
-4. 循序渐进 - 从简单到复杂逐步深入
-5. 跳过此问题
-```
-
-### 6. 目标用户
-```
-问题: 游戏的目标用户群体是？
-
-选项:
-1. 硬核玩家 - 追求挑战和深度，愿意投入大量时间
-2. 休闲玩家 - 碎片时间，轻松体验，单次游戏时间短
-3. 中度玩家 - 有一定投入，追求成长，日均1-2小时
-4. 全年龄段 - 老少皆宜，适合家庭用户
-5. 二次元圈层 - 动漫文化爱好者
-6. 电竞玩家 - 追求竞技和排名
-7. 社交玩家 - 注重社交互动和团队合作
-8. 特定圈层 - 如体育迷、历史爱好者等
-```
-
-### 6.1 目标用户年龄层（可选）
-**触发条件：用户选择了目标用户群体后**
-
-```
-问题: 目标用户的主要年龄层是？（可选）
-
-选项:
-1. 青少年 (12-18岁) - 学生群体
-2. 青年 (18-30岁) - 大学生/职场新人
-3. 中青年 (25-40岁) - 有稳定收入的职场人士
-4. 全年龄 - 不限定年龄
-5. 跳过此问题
-```
-
-### 7. 商业模式
-```
-问题: 游戏的商业模式是什么？
-
-选项:
-1. 免费内购 (F2P) - 免费下载，道具内购，如《原神》《王者荣耀》
-2. 买断制 - 一次付费，完整体验，如《空洞骑士》《星露谷物语》
-3. 免费内购+广告 - 内购为主，广告为辅
-4. 广告变现 - 免费游玩，广告收入，如休闲小游戏
-5. 订阅制 - 按月/年付费，如《魔兽世界》
-6. 混合模式 - 内购+广告+订阅组合
-7. 付费+DLC - 买断+扩展内容
-8. 还没想好，帮我推荐
-```
-
-### 7.1 内购类型细化
-**触发条件：用户选择了包含"内购"的商业模式**
-
-```
-问题: 内购的主要类型是？（可多选）
-
-选项:
-1. 外观/皮肤 - 角色皮肤、特效、装饰
-2. 角色/卡牌 - 新角色、新卡牌获取
-3. 数值成长 - 加速成长、资源购买
-4. 通行证/战令 - 赛季通行证系统
-5. 抽卡/扭蛋 - 随机获取角色/道具
-6. 去广告 - 付费去除广告
-7. 其他
-```
-
-### 8. 游戏规模与开发周期
-```
-问题: 预计的游戏规模和开发周期是？
-
-选项:
-1. 小型项目 - 个人/小团队，3-6个月，如休闲小游戏
-2. 中型项目 - 小团队，6-12个月，如独立游戏
-3. 大型项目 - 中型团队，1-2年，如中型商业游戏
-4. 大型商业项目 - 专业团队，2年以上，如大型商业游戏
-5. 还没确定
-```
-
-### 9. 参考游戏
-```
-问题: 有没有参考的游戏？
-（输入游戏名称，可输入多个用逗号分隔，或输入"跳过"）
-
-示例：《原神》、《塞尔达传说：旷野之息》、《空洞骑士》
-```
-
-### 10. 核心特色
-```
-问题: 游戏最想突出的核心特色是什么？
-（用1-2句话描述游戏最独特的卖点）
-
-示例：
-- "将麻将与RPG养成结合，角色技能影响牌局"
-- "开放世界探索+元素反应战斗系统"
-- "时间循环机制+硬核动作战斗"
-```
-
-### 11. 游戏名称
-```
-问题: 给游戏起个名字吧？
-（或输入"跳过"使用默认名称"未命名游戏"）
-```
-
-### 12. 补充信息（可选）
-```
-问题: 还有其他想补充的信息吗？
-（如：世界观设定、特殊玩法、技术要求等，或输入"跳过"）
-```
-
----
-
-## Mode B: 优化已有策划案流程
-
-### 选择策划案
-```
-问题: 请选择需要优化的策划案（可多选，用逗号分隔）：
-
-检测到的策划案：
-1. Docs/GDD.md - 《战锤40K：异形猎手》
-2. Docs/GDD2.md - 《像素冒险岛》
-3. Docs/GDD3.md - 《三国策略》
-
-请输入编号（多选用逗号分隔，如 1,3）：
-```
-
-### 选择优化方向
-```
-问题: 您希望优化哪些方面？（可多选）
-
-选项:
-1. 🎮 核心玩法 - 调整核心循环、玩法机制
-2. 📊 数值系统 - 平衡性调整、成长曲线优化
-3. 🎨 美术风格 - 调整美术方向、视觉表现
-4. 📱 平台适配 - 更换目标平台、适配方案
-5. 💰 商业模式 - 调整变现策略
-6. 👥 目标用户 - 重新定位用户群体
-7. ⚠️ 风险评估 - 更新风险分析和应对策略
-8. 📅 开发计划 - 调整里程碑和时间规划
-9. 🔄 全面优化 - 重新审视所有模块
-10. 其他 - 用户自定义描述
-
-请输入编号（多选用逗号分隔）：
-```
-
-### 针对性提问
-
-**根据用户选择的优化方向，提出针对性问题：**
-
-#### 优化核心玩法时
-```
-问题: 关于核心玩法优化，您希望：
-
-选项:
-1. 增加新的玩法系统
-2. 调整现有玩法的平衡性
-3. 简化过于复杂的玩法
-4. 增加玩法的深度和策略性
-5. 其他需求（请描述）
-
-请描述具体需求：
-```
-
-#### 优化数值系统时
-```
-问题: 关于数值系统优化，您希望：
-
-选项:
-1. 降低新手门槛
-2. 增加后期深度
-3. 平衡付费与免费玩家
-4. 调整成长节奏
-5. 其他需求（请描述）
-```
-
-#### 优化美术风格时
-```
-问题: 关于美术风格优化，您希望：
-
-选项:
-1. 完全更换美术风格
-2. 在现有基础上微调
-3. 增加美术表现力
-4. 降低美术成本
-5. 其他需求（请描述）
-```
-
-### 多策划案批量优化
-**当用户选择了多个策划案时：**
-
-```
-问题: 您选择了优化多个策划案，请问：
-
-1. 为每个策划案分别设置优化方案
-2. 对所有策划案应用相同的优化方向
-
-请选择：
-```
-
-**如果选择"分别优化"：**
-- 对每个策划案逐一询问优化方向和具体需求
-
-**如果选择"相同优化"：**
-- 只问一次优化方向，应用到所有选中的策划案
-
----
-
-## Output Format
-
-### 新建策划案输出格式
-保存到 `Docs/GDD.md`（如果已存在则保存为 `Docs/GDD2.md`、`Docs/GDD3.md` 等）
+# Game Design Document Creator
+
+通过交互式问答生成或优化游戏设计文档 (GDD)。优先输出可落地的设计方案，而不是泛泛的创意清单。
+
+## Resources
+
+Load these references only when needed:
+
+- `references/question-bank.md`: new-document questions, team-size recommendation rules, quick-mode override parsing.
+- `references/gdd-template.md`: required GDD structure, including core experience statement, competitor analysis, and core metrics.
+- `references/optimization-rules.md`: health analysis and editing rules for existing GDD files.
+- `references/quality-rubric.md`: 100-point GDD quality scoring rubric.
+- `references/mvp-vertical-slice.md`: MVP, vertical slice, and core hypothesis planning.
+- `references/genre-templates.md`: genre-specific questions and required design details.
+
+Use `scripts/gdd_utils.py` for deterministic file operations:
+
+- `python scripts/gdd_utils.py next-path --root .`
+- `python scripts/gdd_utils.py list --root .`
+- `python scripts/gdd_utils.py check Docs/GDD.md`
+- `python scripts/gdd_utils.py append-version Docs/GDD.md --change "优化核心循环"`
+
+## Commands And Triggers
+
+Treat these as equivalent triggers:
+
+- `/gddcreator`
+- "帮我设计一个游戏"
+- "生成游戏策划案"
+- "我想做一个 XX 类型的游戏"
+- "按照/参考/类似 XX 游戏设计"
+- "帮我优化策划案"
+- "修改/完善/升级已有 GDD"
+
+If the user uses old names such as `/gamecreater` or `/game-design-document-creater`, continue normally and prefer `/gddcreator` in future prompts.
+
+## Startup
+
+1. Inspect the user request.
+2. Search for existing GDD files with `scripts/gdd_utils.py list --root .` when scripts are available; otherwise use patterns such as `Docs/**/*.md`, `docs/**/*.md`, `**/*GDD*.md`, and `**/*策划*.md`.
+3. Choose the mode:
+   - Quick mode: request contains "按照", "参考", or "类似" plus a reference game.
+   - Optimization mode: request asks to optimize, modify, improve, complete, diagnose, or upgrade an existing GDD.
+   - New mode: request asks to create or design a game, or no existing GDD is relevant.
+   - Ambiguous command mode: `/gddcreator` with existing GDD files. Ask whether to create a new GDD or optimize an existing one.
+
+## Interaction Rules
+
+- Ask concise questions one at a time unless the environment provides a structured multi-question UI.
+- If a structured question tool is available, use it only when the question has 2-4 options. For more than 4 options, either split the choices into several rounds or present a plain-text numbered list and let the user type numbers.
+- Never call a structured question tool with more options than the current tool schema allows.
+- Let users answer with numbers, labels, free text, "跳过", or "帮我推荐".
+- When the user says "帮我推荐", recommend based on team size, platform, genre, and production constraints.
+- Do not force every optional question. Ask only high-impact follow-ups when the user's intent is already clear.
+- Always ask team size before other new-mode questions unless the user already provided it.
+- Preserve user constraints over defaults.
+- Use milestone-style progress labels instead of fixed counts when branch questions are possible, such as "阶段 2/5：玩法方向", not "问题 1/10".
+
+## Quick Mode
+
+Use when the user asks to design by referencing another game.
+
+1. Load `references/question-bank.md`.
+2. Parse the reference game and any override clause after words such as "但是", "但", "不过", "并且", or "同时".
+3. Build a baseline analysis of the reference game's type, art style, core loop, platform, audience, business model, and key features.
+   - If the reference game is obscure or cannot be confidently identified, say so and ask the user for 2-3 short descriptors such as genre, platform, core loop, art style, or monetization.
+   - If partial information is available, label uncertain fields as assumptions instead of inventing specifics.
+4. Apply explicit user overrides before showing the result.
+5. Show a compact table:
 
 ```markdown
-# 《游戏名称》游戏设计文档 (GDD)
-
-> 生成日期：[日期]
-
----
-
-## 一、游戏概述
-
-### 基本信息
-| 项目 | 内容 |
-|------|------|
-| **游戏名称** | [名称] |
-| **游戏类型** | [类型+细化类型] |
-| **美术风格** | [风格+色调] |
-| **目标平台** | [平台] |
-| **屏幕方向** | [横屏/竖屏/双向支持]（仅手机游戏） |
-| **游戏引擎** | [引擎+版本] |
-| **目标用户** | [用户群体+年龄层] |
-| **商业模式** | [模式+内购类型] |
-| **游戏规模** | [小型/中型/大型] |
-| **开发周期** | [预计时间] |
-| **核心特色** | [特色描述] |
-
-### 游戏简介
-[一句话描述游戏核心特色]
-
-### 参考游戏
-[参考游戏列表]
-
----
-
-## 二、核心玩法设计
-
-### 核心循环
-[根据选择展开详细的核心循环设计]
-
-### 玩法深度
-[易上手难精通/简单休闲/硬核深度/循序渐进]
-
-### 主要系统
-[根据游戏类型列出主要系统]
-
-### 操作方式
-[根据平台和类型设计操作方式]
-
----
-
-## 三、系统详细设计
-
-### 3.1 [系统1名称]
-[详细设计]
-
-### 3.2 [系统2名称]
-[详细设计]
-
----
-
-## 四、数值设计框架
-
-### 核心数值体系
-[根据类型设计数值框架]
-
-### 成长曲线
-[玩家成长设计]
-
----
-
-## 五、美术需求清单
-
-### 角色美术
-[需求列表]
-
-### 场景美术
-[需求列表]
-
-### UI设计
-[需求列表]
-
-### 特效音效
-[需求列表]
-
----
-
-## 六、技术架构建议
-
-### 推荐引擎
-[根据平台推荐]
-
-### 核心技术点
-[技术要点列表]
-
----
-
-## 七、开发里程碑
-
-### Phase 1: 核心玩法验证
-[内容]
-
-### Phase 2: 系统完善
-[内容]
-
-### Phase 3: 内容填充
-[内容]
-
-### Phase 4: 打磨上线
-[内容]
-
----
-
-## 八、风险评估
-
-### 技术风险
-[风险点]
-
-### 市场风险
-[风险点]
-
-### 应对策略
-[策略]
-
----
-
-## 九、版本历史
-
-| 版本 | 日期 | 修改内容 |
-|------|------|----------|
-| v1.0 | [日期] | 初始版本 |
-
----
-
-*本文档由游戏策划案生成器自动生成，可根据实际开发情况迭代更新。*
+| 项目 | 参考游戏基线 | 用户覆盖项 | 最终方向 |
+|------|--------------|------------|----------|
+| 游戏类型 | ... | ... | ... |
+| 美术风格 | ... | ... | ... |
+| 核心循环 | ... | ... | ... |
+| 商业模式 | ... | ... | ... |
 ```
 
-### 优化已有策划案输出格式
-在原文件基础上更新，并添加版本历史记录
-
----
-
-## Implementation
-
-执行步骤：
-
-1. **检查已有策划案**
-   - 使用 Glob 搜索项目内的策划案文件
-   - 列出找到的文件供用户选择
-
-2. **快速模式检测**
-   - 如果用户说"按照XX游戏设计"或"参考XX游戏"
-   - 自动分析参考游戏信息
-   - 展示分析结果
-   - 询问是否需要修改
-   - 根据用户选择生成或针对性提问
-
-3. **模式选择**
-   - 有策划案：询问新建还是优化
-   - 无策划案：直接新建
-
-4. **新建模式**
-   - 欢迎用户
-   - 逐个提问（支持细化问题）
-   - 记录用户答案
-   - 生成文档
-
-5. **优化模式**
-   - 列出现有策划案
-   - 选择要优化的策划案（支持多选）
-   - 选择优化方向（支持多选）
-   - 针对性提问
-   - 更新文档
-
-6. **后续支持**
-   - 询问是否需要深入某个模块
-   - 支持迭代修改
-
-## UI Interaction
-
-**重要：所有选项类问题必须使用 AskUserQuestion 工具调用选项框！**
-
-### 选项框调用示例
-
-```json
-AskUserQuestion({
-  "questions": [{
-    "question": "你想制作什么类型的游戏？",
-    "header": "游戏类型",
-    "multiSelect": false,
-    "options": [
-      {"label": "动作游戏 (ACT)", "description": "强调操作和反应"},
-      {"label": "角色扮演 (RPG)", "description": "角色成长和剧情"},
-      {"label": "策略游戏 (SLG/RTS)", "description": "战略规划和资源管理"},
-      ...
-    ]
-  }]
-})
-```
-
-### 多选示例
-
-```json
-AskUserQuestion({
-  "questions": [{
-    "question": "请选择需要修改的方面",
-    "header": "修改选项",
-    "multiSelect": true,
-    "options": [
-      {"label": "🎮 游戏类型", "description": "修改游戏类型"},
-      {"label": "🎨 美术风格", "description": "修改美术风格"},
-      ...
-    ]
-  }]
-})
-```
-
-### 快速模式确认示例
-
-```json
-AskUserQuestion({
-  "questions": [{
-    "question": "请问您是否需要修改这些元素？",
-    "header": "确认生成",
-    "multiSelect": false,
-    "options": [
-      {"label": "✅ 直接生成策划案", "description": "无需修改，直接使用分析结果生成"},
-      {"label": "✏️ 修改部分元素", "description": "对部分内容进行调整后再生成"}
-    ]
-  }]
-})
-```
-
-## Notes
-
-- 每个问题都要等待用户回答后再继续
-- 用户可以随时输入"跳过"跳过当前问题
-- 用户可以输入"修改"修改之前的回答
-- 支持多选的问题要明确提示用户
-- 细化问题只在相关类型被选择时触发
-- 多策划案优化时，要区分"分别优化"和"统一优化"
-- 手机游戏屏幕方向问题只在选择手机平台时触发（微信小游戏、手机APP、多平台）
-- 屏幕方向推荐根据游戏类型智能推荐：动作/射击/RPG→横屏，休闲/卡牌→竖屏，棋牌/策略→双向
-- 可选问题（如美术色调、年龄层、玩法深度）可以跳过，不影响策划案生成
-- 每个选项都附带示例游戏，帮助用户理解选项含义
-- 内购类型细化只在选择包含内购的商业模式时触发
-
----
-
-## Showcase - 展示效果
-
-### 🚀 场景一：快速模式（参考游戏生成）
-
-**触发条件**: 用户说"按照/参考XX游戏给我设计一个游戏"
-
-**用户输入：**
-```
-按照原神给我设计一个游戏
-```
-
-**助手响应：**
-
----
-
-📊 **已分析《原神》的核心信息：**
-
-| 项目 | 分析结果 |
-|------|----------|
-| **游戏类型** | 开放世界动作角色扮演 (Open World ARPG) |
-| **美术风格** | 3D二次元动漫风 + 赛克风格渲染 |
-| **核心循环** | 探索收集 + 战斗刷宝 + 剧情体验 |
-| **目标平台** | 多平台 (PC/手机/主机) |
-| **屏幕方向** | 横屏（手机端） |
-| **游戏引擎** | Unity |
-| **目标用户** | 中度玩家 + 二次元圈层 |
-| **商业模式** | 免费内购 (F2P) + 抽卡系统 |
-| **核心特色** | 元素反应战斗系统 + 开放世界探索 + 多角色切换 |
-
----
-
-**请问您是否需要修改这些元素？**
-
-- ✅ 直接生成策划案（无需修改）
-- ✏️ 修改部分元素
-
----
-
----
-
-### 📝 场景二：新建模式（无策划案时）
-
-**触发条件**: 项目内无策划案，或用户说"帮我设计游戏"
-
-**用户输入：**
-```
-帮我设计一个麻将游戏
-```
-
-**助手响应：**（检测到有策划案，但用户说的是"设计"，直接进入新建模式）
-
----
-
-🎮 **欢迎使用游戏策划案生成器！**
-
----
-
-**问题 1/10**: 你想制作什么类型的游戏？
-
-- 动作游戏 (ACT) - 强调操作和反应
-- 角色扮演 (RPG) - 角色成长和剧情
-- 策略游戏 (SLG/RTS) - 战略规划和资源管理
-- 休闲游戏 - 简单易上手，碎片时间
-- 模拟经营 - 经营管理，资源调配
-- 卡牌/回合制 - 策略卡牌，回合战斗
-- 射击游戏 - 射击战斗
-- 其他类型 - 用户自定义描述
-
-💡 **提示**：麻将游戏属于休闲/卡牌类游戏
-
----
-
----
-
-### 🔄 场景三：命令触发（询问选择）
-
-**触发条件**: 项目内有策划案 + 用户输入命令
-
-**用户输入：**
-```
-/game-design-document-creater
-```
-
-**助手响应：**
-
----
-
-🎮 **欢迎使用游戏策划案生成器！**
-
-**检测到项目内已有以下策划案：**
-
-| 编号 | 文件名 | 游戏名称 |
-|------|--------|----------|
-| 1 | Docs/GDD.md | 《战锤40K：异形猎手》 |
-| 2 | Docs/GDD2.md | 《元素幻想：提瓦特之旅》 |
-
-**请问您想要：**
-1. 📝 编写新的游戏策划案
-2. ✏️ 优化已有策划案
-
----
-
----
-
-### ✏️ 场景四：优化模式
-
-**触发条件**: 用户说"帮我优化策划案"、"修改策划案"
-
-**用户输入：**
-```
-帮我优化策划案
-```
-
-**助手响应：**（直接进入优化模式）
-
----
-
-🎮 **欢迎使用游戏策划案生成器！**
-
-**请选择需要优化的策划案（可多选，用逗号分隔）：**
-
-| 编号 | 文件名 | 游戏名称 |
-|------|--------|----------|
-| 1 | Docs/GDD.md | 《战锤40K：异形猎手》 |
-| 2 | Docs/GDD2.md | 《元素幻想：提瓦特之旅》 |
-
----
-
----
-
-### 📊 触发逻辑速查表
-
-| 场景 | 项目策划案 | 用户输入 | 进入模式 |
-|------|:----------:|----------|----------|
-| 快速模式 | 有/无 | "按照原神设计游戏" | 快速模式 |
-| 无策划案 | 无 | 任意 | 新建模式 |
-| 命令触发 | 有 | `/game-design-document-creater` | 询问选择 |
-| 设计语言 | 有 | "帮我设计游戏" | 新建模式 |
-| 优化语言 | 有 | "帮我优化策划案" | 优化模式 |
-| 设计语言 | 无 | "帮我设计游戏" | 新建模式 |
-
----
-
-### 🎮 场景五：麻将游戏设计（完整流程示例）
-
-**用户输入：**
-```
-帮我设计一个麻将游戏
-```
-
-**助手响应：**（检测到有策划案，但用户说"设计"，进入新建模式）
-
----
-
-🎮 **欢迎使用游戏策划案生成器！**
-
----
-
-**问题 1/10**: 你想制作什么类型的游戏？
-
-- 动作游戏 (ACT)
-- 角色扮演 (RPG)
-- 策略游戏 (SLG/RTS)
-- 休闲游戏
-- 模拟经营
-- 卡牌/回合制
-- 射击游戏
-- 其他类型
-
-💡 **提示**：麻将游戏属于休闲/卡牌类游戏
-
----
-
-**用户选择：** 休闲游戏
-
-**助手继续：**
-
----
-
-✅ 已记录：休闲游戏
-
----
-
-**问题 1.1**: 休闲游戏的具体类型是？
-
-- 消除类 - 三消、连连看
-- 麻将/棋牌类 - 麻将、扑克、象棋
-- 跑酷类 - 跳跃跑酷
-- 益智解谜 - 逻辑推理
-- 放置挂机 - 自动收益
-- 其他类型
-
----
-
-**用户选择：** 麻将/棋牌类
-
-**助手继续：**
-
----
-
-✅ 已记录：麻将/棋牌类游戏
-
----
-
-**问题 1.2**: 麻将游戏的具体玩法是？
-
-- 经典麻将 - 四川麻将、广东麻将等
-- 四川血战麻将 - 血战到底玩法
-- 国标麻将 - 竞技麻将
-- 麻将消消乐 - 麻将主题消除
-- 麻将竞技对战 - 实时PVP
-- 麻将+RPG - 麻将结合角色养成
-- 其他玩法
-
----
-
-**用户选择：** 四川血战麻将
-
-**助手继续：**
-
----
-
-✅ 已记录：四川血战麻将
-
----
-
-**问题 2/10**: 游戏的美术风格是怎样的？
-
-- 2D像素风
-- 2D手绘风
-- 2D卡通风
-- 3D写实风
-- 国风/水墨
-- 其他风格
-
-💡 **提示**：麻将游戏常用国风/水墨风格
-
----
-
-... (继续后续问题)
-
-**文档标题：** 《游戏名称》游戏设计文档 (GDD)
-
-**文档章节：**
-
-```
-一、游戏概述
-   ├─ 基本信息（类型、风格、平台、引擎、用户、模式）
-   ├─ 游戏简介
-   └─ 参考游戏
-
-二、核心玩法设计
-   ├─ 核心循环图
-   ├─ 主要系统列表
-   └─ 操作方式
-
-三、系统详细设计
-   ├─ 3.1 武器系统
-   ├─ 3.2 技能系统
-   ├─ 3.3 关卡系统
-   └─ ... (根据类型动态生成)
-
-四、数值设计框架
-   ├─ 核心数值体系
-   └─ 成长曲线
-
-五、美术需求清单
-   ├─ 角色美术
-   ├─ 场景美术
-   ├─ UI设计
-   └─ 特效音效
-
-六、技术架构建议
-   ├─ 推荐引擎
-   └─ 核心技术点
-
-七、开发里程碑
-   ├─ Phase 1: 核心玩法验证
-   ├─ Phase 2: 系统完善
-   ├─ Phase 3: 内容填充
-   └─ Phase 4: 打磨上线
-
-八、风险评估
-   ├─ 技术风险
-   ├─ 市场风险
-   └─ 应对策略
-
-九、版本历史
-   └─ 记录每次修改
-```
-
----
-
-### 📊 功能特性对比
-
-| 特性 | 快速模式 | 新建模式 | 优化模式 |
-|------|:--------:|:--------:|:--------:|
-| 自动分析参考游戏 | ✅ | ❌ | ❌ |
-| 完整交互式问答 | 部分 | ✅ | 部分 |
-| 游戏类型细化问题 | ❌ | ✅ | ❌ |
-| 休闲/棋牌细化问题 | ❌ | ✅ | ❌ |
-| 模拟经营细化问题 | ❌ | ✅ | ❌ |
-| 卡牌/回合制细化问题 | ❌ | ✅ | ❌ |
-| 体育/竞速细化问题 | ❌ | ✅ | ❌ |
-| 音乐/节奏细化问题 | ❌ | ✅ | ❌ |
-| 恐怖/解谜细化问题 | ❌ | ✅ | ❌ |
-| 美术风格色调细化 | ❌ | ✅ | ❌ |
-| 目标用户年龄层细化 | ❌ | ✅ | ❌ |
-| 核心玩法深度细化 | ❌ | ✅ | ❌ |
-| 内购类型细化 | ❌ | ✅ | ❌ |
-| 游戏规模与开发周期 | ❌ | ✅ | ❌ |
-| 选择性修改元素 | ✅ | ❌ | ✅ |
-| 多策划案选择 | ❌ | ❌ | ✅ |
-| 批量优化 | ❌ | ❌ | ✅ |
-| 版本历史记录 | ✅ | ✅ | ✅ |
-| AskUserQuestion选项框 | ✅ | ✅ | ✅ |
-| 多选支持 | ✅ | ✅ | ✅ |
-| 跳过选项 | ✅ | ✅ | ✅ |
-| 手机屏幕方向询问 | ✅ | ✅ | ✅ |
-| 示例游戏参考 | ✅ | ✅ | ✅ |
-
----
-
-### 📱 场景六：手机游戏屏幕方向选择
-
-**触发条件**: 用户选择了"手机APP"或"微信小游戏"作为目标平台
-
-**用户选择平台后：**
-
----
-
-✅ 已记录：手机APP (iOS/Android)
-
----
-
-**问题 3.1**: 游戏的屏幕方向是？
-
-- 竖屏 (Portrait) - 单手操作友好，适合休闲游戏
-- 横屏 (Landscape) - 沉浸感强，适合动作/射击/RPG游戏
-- 双向支持 - 支持横竖屏切换，适配性更广
-- 还没想好，帮我推荐
-
----
-
-**用户选择：** 还没想好，帮我推荐
-
-**助手响应：**
-
----
-
-根据您的游戏类型（动作游戏），推荐如下：
-
-- **动作/射击/RPG游戏** → 推荐【横屏】，操作空间大，沉浸感强
-- 休闲/卡牌/消除游戏 → 推荐【竖屏】，单手操作，碎片时间友好
-- 棋牌/策略游戏 → 推荐【双向支持】，不同场景灵活切换
-
-请问您选择哪种方向？
-
----
-
-**用户选择：** 横屏 (Landscape)
-
-**助手继续：**
-
----
-
-✅ 已记录：横屏 (Landscape)
-
-💡 **横屏游戏设计要点**：
-- UI布局需要适配横屏比例（16:9 或 18:9）
-- 虚拟摇杆/技能按钮适合左右手分工操作
-- 需要处理刘海屏/挖孔屏的安全区域
-
----
+6. Ask whether to generate directly or adjust selected elements.
+7. Before writing, show a short generation summary and ask the user to confirm or revise.
+8. Generate the GDD using `references/gdd-template.md` after confirmation.
+
+Do not copy protected IP, characters, story, names, levels, or art assets from the reference game. Borrow only design patterns and clearly state the differentiation.
+
+## New GDD Mode
+
+1. Load `references/question-bank.md`.
+2. Load `references/genre-templates.md` after the genre is known.
+3. Load `references/mvp-vertical-slice.md` before writing milestones.
+4. Ask the team-size question first:
+   - 个人独立开发
+   - 2-5 人小团队
+   - 专业团队
+5. Continue through the question bank, adapting depth to the user's answers.
+6. Use team size to adjust recommendations:
+   - Personal indie: reduce scope, recommend low-cost art and validation milestones.
+   - Small team: focus on vertical slice, content reuse, and one clear differentiator.
+   - Professional team: include analytics, live-ops, production pipeline, and market positioning where appropriate.
+7. Before writing the document, summarize the captured direction and ask the user to confirm or revise.
+8. Load `references/gdd-template.md` and create the Markdown GDD after confirmation.
+9. Save new GDD files under `Docs/`. Prefer `scripts/gdd_utils.py next-path --root .` to create the directory and pick the path.
+
+The generated GDD must include:
+
+- Core experience statement: "在这个游戏里，玩家感受到..."
+- Market competitor analysis table.
+- Core metrics appropriate to team size and business model.
+- MVP scope, vertical slice, and core hypotheses.
+- Development milestones with validation goals.
+- Risks covering technology, market, and production.
+
+## Optimization Mode
+
+1. Find existing GDD files.
+2. If multiple files match, ask the user to choose one or more.
+3. Load `references/optimization-rules.md`.
+4. Load `references/quality-rubric.md`.
+5. Read the selected GDD file before asking for optimization direction.
+6. Output a current-document health analysis and 100-point quality score covering:
+   - Section completeness
+   - Core experience statement
+   - Core loop clarity
+   - System coherence
+   - Numerical framework
+   - Market differentiation
+   - Core metrics
+   - MVP and vertical slice quality
+   - Team-size/scope fit
+   - Risk quality
+7. Ask the user which dimensions to optimize.
+8. Edit the chosen GDD in place unless the user asks for a copy.
+9. Add or update the version-history section with a concise description of the change. Prefer `scripts/gdd_utils.py append-version` when scripts are available.
+
+When adding missing sections, follow `references/gdd-template.md`. When optimizing several GDDs, diagnose each file independently even if the same optimization direction is applied.
+
+## Output Standards
+
+- Use clear Chinese by default.
+- Keep design claims concrete and testable.
+- Tie every major system back to the core experience statement.
+- Make scope realistic for the team size.
+- In competitor analysis, explain difference and risk instead of simply listing reference games.
+- In core metrics, choose indicators that fit the project:
+  - Indie: prototype completion, playtest completion, average session length, wishlist/demo conversion, feedback quality.
+  - Small team: D1/D7 retention, session length, content consumption, conversion, production velocity.
+  - Professional team: D1/D7/D30 retention, ARPU, LTV, payer conversion, ROAS, live-ops cadence.
+- Always define MVP scope and a vertical slice. Use them to cut features when the plan is too large.
+- Apply genre-specific guidance from `references/genre-templates.md` after the user selects a genre.
+
+## Validation
+
+Before finalizing, check:
+
+- The generated or edited file exists at the intended path.
+- Run `scripts/gdd_utils.py check <path>` when scripts are available.
+- The GDD contains the upgraded sections: 开发团队/团队规模, 核心体验陈述, 市场竞品分析, 核心指标定义, and MVP 与垂直切片.
+- Quick-mode overrides from "但是..." style instructions were applied.
+- Existing user content was preserved unless it conflicted with the requested optimization.
