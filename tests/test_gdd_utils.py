@@ -1,4 +1,5 @@
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -9,9 +10,12 @@ SCRIPT = ROOT / "scripts" / "gdd_utils.py"
 
 
 def run_cli(*args, cwd=None):
+    env = os.environ.copy()
+    env["PYTHONUTF8"] = "1"
     return subprocess.run(
         [sys.executable, str(SCRIPT), *args],
         cwd=cwd or ROOT,
+        env=env,
         text=True,
         encoding="utf-8",
         capture_output=True,
