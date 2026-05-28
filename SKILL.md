@@ -121,6 +121,7 @@ Do not copy protected IP, characters, story, names, levels, or art assets from t
 The generated GDD must include:
 
 - Core experience statement: "在这个游戏里，玩家感受到..."
+- Target player profile: audience orientation, age band, core motivation, play frequency, and content boundaries. Allow multi-select where useful and note conflicts between audience groups.
 - Market competitor analysis table.
 - Core metrics appropriate to team size and business model.
 - MVP scope, vertical slice, and core hypotheses.
@@ -162,6 +163,7 @@ If the user asks to continue a previously interrupted GDD session, inspect the c
 - Keep design claims concrete and testable.
 - Tie every major system back to the core experience statement.
 - Make scope realistic for the team size.
+- Define the target player profile before choosing monetization or content tone. Include audience orientation, age band, motivation, play frequency, and content boundaries when enough information is available.
 - In competitor analysis, explain difference and risk instead of simply listing reference games.
 - In core metrics, choose indicators that fit the project:
   - Indie: prototype completion, playtest completion, average session length, wishlist/demo conversion, feedback quality.

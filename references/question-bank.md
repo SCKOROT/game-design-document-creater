@@ -58,9 +58,20 @@ Structured UI grouping example for the agent, not user-facing copy:
 
 For multi-select core loops, prefer plain-text numbered input if the list has more than 4 choices.
 
-7. Target audience
-   - Hardcore, casual, mid-core, all ages, anime audience, competitive players, social players, specific niche.
-   - Optional age band: 12-18, 18-30, 25-40, all ages.
+7. Target player profile
+   Ask this before business model because audience strongly affects theme, art direction, session length, monetization, and content tone.
+   - Audience orientation: male-oriented, female-oriented, mixed/general audience, family/all-ages, niche community, unknown/recommendation.
+   - Age band: under 12, 12-18, 18-24, 25-34, 35-44, 45+, all ages, unknown/recommendation.
+   - Player motivation: challenge/mastery, collection/progression, social interaction, relaxation, story/immersion, competition/ranking, creativity/expression, exploration/discovery.
+   - Play frequency: fragmented short sessions, daily medium sessions, long weekend sessions, hardcore repeated play.
+   - Content sensitivity: family-friendly, teen-friendly, mature themes allowed, avoid horror/violence, avoid sexualized content, unknown/recommendation.
+   - Multi-select is allowed for audience orientation, age band, and player motivation. If the user chooses multiple groups, explain which design choices serve each primary group and flag conflicts.
+
+Structured UI grouping example for the agent, not user-facing copy:
+- 先问受众取向：男性向 / 女性向 / 泛用户 / 还没确定
+- 再问年龄层：12 岁以下 / 12-18 / 18-34 / 35+
+- 最后按需要追问动机：挑战 / 收集成长 / 社交 / 放松 / 剧情 / 竞技 / 创造
+- 如果用户想多选，允许用编号组合回答，例如 "1,3" 或 "挑战+收集成长"。
 
 8. Business model
    - Premium, free-to-play with IAP, IAP + ads, ads, subscription, hybrid, premium + DLC, recommendation.
